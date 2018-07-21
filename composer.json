@@ -1,0 +1,41 @@
+{
+    "name": "andydune/web-telegram",
+    "description": "",
+    "keywords": [
+        "php"
+    ],
+    "authors": [
+        {
+            "name": "Andrey Ryzhov",
+            "email": "info@rznw.ru"
+        }
+    ],
+    "homepage": "https://github.com/AndyDune/WebTelegram",
+    "autoload": {
+        "psr-4": {
+            "AndyDune\\WebTelegram\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.1",
+        "guzzlehttp/guzzle": "^6.3",
+        "andydune/datetime": "2.*",
+        "andydune/mongo-odm": "1.*",
+        "andydune/mongo-query": "1.*",
+        "andydune/array-container": "^1",
+        "andydune/string-replace": "^1",
+        "zendframework/zend-dom": "2.*",
+        "andydune/pipeline": "*",
+        "andydune/custom-string-explode": "1.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0.8"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload-dev": {
+        "psr-4": {
+            "AndyDuneTest\\WebTelegram\\": "test/"
+        }
+    }
+}
