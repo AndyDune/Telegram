@@ -70,6 +70,17 @@ class RequestBase
             return true;
 
         } catch (\Exception $e) {
+
+            /*
+            $message = $e->getMessage();
+             * 0:cURL error 6: Could not resolve host: telegram.me (see http://curl.haxx.se/libcurl/c/libcurl-errors.html)
+            if (preg_match('|Could not resolve host|', $message)) {
+                $this->errorRetrieveDataFormTelegram = true;
+            } else if (preg_match('|Server error|ui', $message)) {
+                $this->errorRetrieveDataFormTelegram = true;
+            }             *
+             */
+
             $this->responseCode = null;
             $this->responseContentType = null;
             $this->responseBody = null;
