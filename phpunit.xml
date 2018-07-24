@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="./vendor/autoload.php"
+         bootstrap="test/bootstrap.php"
          colors="true">
     <testsuites>
         <testsuite name="CustomStringExplode Test Suite">
@@ -20,4 +20,11 @@
             <directory suffix=".php">./src</directory>
         </whitelist>
     </filter>
+
+    <php>
+        <ini name="date.timezone" value="UTC"/>
+        <const name="DOCTRINE_MONGODB_SERVER" value="mongodb://localhost:27017" />
+        <const name="DOCTRINE_MONGODB_DATABASE" value="doctrine_odm_tests" />
+    </php>
+
 </phpunit>
