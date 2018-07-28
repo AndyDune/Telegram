@@ -14,7 +14,7 @@ namespace AndyDune\WebTelegram\DoctrineOdm\Documents;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 
-/** @ODM\Document(collection="channel_messages") */
+/** @ODM\Document(collection="channel_messages", repositoryClass="AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages") */
 class ChannelMessages
 {
     /** @ODM\Id */
@@ -22,6 +22,10 @@ class ChannelMessages
 
     /** @ODM\Field(type="string") */
     private $channelName = '';
+
+
+    /** @ODM\ReferenceOne(targetDocument="ChannelsInfoForMessages", storeAs="id") */
+    private $channel;
 
     /** @ODM\Field(type="date") */
     private $date;

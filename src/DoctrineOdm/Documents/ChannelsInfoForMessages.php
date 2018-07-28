@@ -53,6 +53,9 @@ class ChannelsInfoForMessages
     /** @ODM\Field(type="date") */
     private $dateToUpdateAfter = null;
 
+    /** @ODM\Field(type="int") */
+    private $countMessagesPerWeek = 0;
+
     /**
      * @return mixed
      */
