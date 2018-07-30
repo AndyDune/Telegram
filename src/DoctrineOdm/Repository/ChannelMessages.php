@@ -58,6 +58,23 @@ class ChannelMessages extends DocumentRepository
      */
     public function findMessagesOfChannel(ChannelsInfoForMessages $channel)
     {
-        return $this->findBy(['channel' => $channel->getId()], $this->sort, $this->limit, $this->skip);
+        return $this->findBy(['channel' => $channel], $this->sort, $this->limit, $this->skip);
     }
+
+    /**
+     * @param ChannelsInfoForMessages $channel
+     * @param int $limit
+     * @param int $skip
+     * @return array
+     */
+    public function getMessageOfChannel(ChannelsInfoForMessages $channel, $id)
+    {
+        return $this->findOneBy(['channel' => $channel, 'idWithinChannel' => $id]);
+    }
+
+    public function getMessageOfChannelWithName($name, $id)
+    {
+        return $this->findOneBy(['channelName' => $name, 'idWithinChannel' => $id]);
+    }
+
 }
