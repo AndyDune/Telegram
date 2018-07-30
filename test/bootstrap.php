@@ -23,17 +23,18 @@ $loader = require $file;
 $doctrineFolder = __DIR__ . '/doctrine/';
 
 $config = new \Doctrine\ODM\MongoDB\Configuration();
+$config->setDefaultDB(DOCTRINE_MONGODB_DATABASE);
 $config->setProxyDir($doctrineFolder . 'proxies');
 $config->setProxyNamespace('AndyDune\WebTelegram\Proxies');
 $config->setHydratorDir($doctrineFolder . 'hydrators');
 $config->setHydratorNamespace('AndyDune\WebTelegram\Hydrators');
 
-$config->setMetadataDriverImpl(\Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::create(__DIR__ . '/../src/DoctrineOdm/Documents'));
+$config->setMetadataDriverImpl(\Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::create([__DIR__ . '/../src/DoctrineOdm/Documents']));
 
 //return \Doctrine\ODM\MongoDB\DocumentManager::create(new \Doctrine\MongoDB\Connection(), $config);
 
 $sm = $registry->getServiceManager();
-$sm->setService('document_manager', \Doctrine\ODM\MongoDB\DocumentManager::create(new \Doctrine\MongoDB\Connection(), $config));
+$sm->setService('document_manager', \Doctrine\ODM\MongoDB\DocumentManager::create(new \Doctrine\MongoDB\Connection(DOCTRINE_MONGODB_SERVER), $config));
 
 $sm->setFactory(\AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessages::class, function (\Zend\ServiceManager\ServiceManager $serviceLocator) {
     /** @var \Doctrine\ODM\MongoDB\DocumentManager $dm */

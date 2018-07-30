@@ -11,12 +11,20 @@
 
 
 namespace AndyDune\WebTelegram\DoctrineOdm\Documents;
+use AndyDune\DateTime\DateTime;
+use AndyDune\WebTelegram\Format\NormalizeName;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 
 /** @ODM\Document(collection="channel_info_for_messages") */
 class ChannelsInfoForMessages
 {
+    use NormalizeName;
+
+    const STATUS_READY = 'ready';
+    const STATUS_OFF = 'off';
+    const STATUS_GO_TO_CHECK = 'to_check';
+
     /** @ODM\Id */
     private $id;
 
@@ -46,6 +54,9 @@ class ChannelsInfoForMessages
 
     /** @ODM\Field(type="date") */
     private $lastDateLoadPostPrevious;
+
+    /** @ODM\Field(type="date") */
+    private $dateToCheckMessagesAfter;
 
     /** @ODM\Field(type="int") */
     private $postCount = 0;
@@ -82,10 +93,12 @@ class ChannelsInfoForMessages
 
     /**
      * @param mixed $name
+     * @return $this
      */
-    public function setName($name): void
+    public function setName($name): ChannelsInfoForMessages
     {
-        $this->name = $name;
+        $this->name = $this->normalizeName($name);
+        return $this;
     }
 
     /**
@@ -248,6 +261,53 @@ class ChannelsInfoForMessages
         $this->dateToUpdateAfter = $dateToUpdateAfter;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getDateToCheckMessagesAfter()
+    {
+        return $this->dateToCheckMessagesAfter;
+    }
+
+    /**
+     * @param mixed $days
+     * @return $this
+     */
+    public function addDaysToCheckMessagesAfter($days): ChannelsInfoForMessages
+    {
+        $date = new DateTime();
+        $date->add(sprintf('+ %s days', $date));
+        $this->dateToCheckMessagesAfter = $date->getValue();
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCountMessagesPerWeek()
+    {
+        return $this->countMessagesPerWeek;
+    }
+
+    /**
+     * @param mixed $countMessagesPerWeek
+     * @return  $this
+     */
+    public function setCountMessagesPerWeek($countMessagesPerWeek): ChannelsInfoForMessages
+    {
+        $this->countMessagesPerWeek = $countMessagesPerWeek;
+        return $this;
+    }
+
+
+    public function populateForNew()
+    {
+        $this->lastDateLoadPost = new \DateTime();
+        $this->lastDateCheckChannelExist = new \DateTime();
+        $this->dateToCheckMessagesAfter = new \DateTime();
+        $this->status = self::STATUS_READY;
+        return $this;
+    }
 
 
 }
