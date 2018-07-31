@@ -7,6 +7,8 @@
  * | Date: 24.07.2018                            |
  * -----------------------------------------------
  *
+ * О индексах:
+ * https://www.doctrine-project.org/projects/doctrine-mongodb-odm/en/1.2/reference/indexes.html#indexes
  */
 
 
@@ -14,6 +16,7 @@ namespace AndyDune\WebTelegram\DoctrineOdm\Documents;
 use AndyDune\DateTime\DateTime;
 use AndyDune\WebTelegram\Format\NormalizeName;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\Index;
 
 
 /** @ODM\Document(collection="channel_info_for_messages") */
@@ -28,7 +31,7 @@ class ChannelsInfoForMessages
     /** @ODM\Id */
     private $id;
 
-    /** @ODM\Field(type="string") */
+    /** @ODM\Field(type="string") @Index(unique=true, order="asc", name="name") */
     private $name = '';
 
     /** @ODM\Field(type="string") */
@@ -127,10 +130,15 @@ class ChannelsInfoForMessages
 
     /**
      * @param mixed $maxKnownPostId
+     * @return $this
      */
-    public function setMaxKnownPostId($maxKnownPostId): void
+    public function setMaxKnownPostId($maxKnownPostId): ChannelsInfoForMessages
     {
-        $this->maxKnownPostId = $maxKnownPostId;
+        if (!$this->maxKnownPostId or $this->maxKnownPostId < $maxKnownPostId) {
+            $this->maxKnownPostId = $maxKnownPostId;
+        }
+
+        return $this;
     }
 
     /**
@@ -143,10 +151,14 @@ class ChannelsInfoForMessages
 
     /**
      * @param mixed $maxLoadedPostId
+     * @return  $this
      */
-    public function setMaxLoadedPostId($maxLoadedPostId): void
+    public function setMaxLoadedPostId($maxLoadedPostId): ChannelsInfoForMessages
     {
-        $this->maxLoadedPostId = $maxLoadedPostId;
+        if (!$this->maxLoadedPostId or $this->maxLoadedPostId < $maxLoadedPostId) {
+            $this->maxLoadedPostId = $maxLoadedPostId;
+        }
+        return $this;
     }
 
     /**
@@ -159,10 +171,14 @@ class ChannelsInfoForMessages
 
     /**
      * @param mixed $minLoadedPostId
+     * @return $this
      */
-    public function setMinLoadedPostId($minLoadedPostId): void
+    public function setMinLoadedPostId($minLoadedPostId): ChannelsInfoForMessages
     {
-        $this->minLoadedPostId = $minLoadedPostId;
+        if (!$this->minLoadedPostId or $this->minLoadedPostId > $minLoadedPostId) {
+            $this->minLoadedPostId = $minLoadedPostId;
+        }
+        return $this;
     }
 
     /**
@@ -191,10 +207,16 @@ class ChannelsInfoForMessages
 
     /**
      * @param mixed $lastDateLoadPost
+     * @return  $this
      */
-    public function setLastDateLoadPost($lastDateLoadPost): void
+    public function setLastDateLoadPost($lastDateLoadPost = null): ChannelsInfoForMessages
     {
+        if (!$lastDateLoadPost) {
+            $lastDateLoadPost = new \DateTime();
+        }
+
         $this->lastDateLoadPost = $lastDateLoadPost;
+        return $this;
     }
 
     /**
@@ -208,9 +230,14 @@ class ChannelsInfoForMessages
     /**
      * @param mixed $lastDateLoadPostNext
      */
-    public function setLastDateLoadPostNext($lastDateLoadPostNext): void
+    public function setLastDateLoadPostNext($lastDateLoadPostNext = null): ChannelsInfoForMessages
     {
+        if (!$lastDateLoadPostNext) {
+            $lastDateLoadPostNext = new \DateTime();
+        }
+
         $this->lastDateLoadPostNext = $lastDateLoadPostNext;
+        return $this;
     }
 
     /**
@@ -223,10 +250,16 @@ class ChannelsInfoForMessages
 
     /**
      * @param mixed $lastDateLoadPostPrevious
+     * @return $this
      */
-    public function setLastDateLoadPostPrevious($lastDateLoadPostPrevious): void
+    public function setLastDateLoadPostPrevious($lastDateLoadPostPrevious): ChannelsInfoForMessages
     {
+        if (!$lastDateLoadPostPrevious) {
+            $lastDateLoadPostPrevious = new \DateTime();
+        }
+
         $this->lastDateLoadPostPrevious = $lastDateLoadPostPrevious;
+        return $this;
     }
 
     /**
@@ -306,6 +339,9 @@ class ChannelsInfoForMessages
         $this->lastDateCheckChannelExist = new \DateTime();
         $this->dateToCheckMessagesAfter = new \DateTime();
         $this->status = self::STATUS_READY;
+        $this->minLoadedPostId = 0;
+        $this->maxLoadedPostId = 0;
+        $this->maxKnownPostId = 0;
         return $this;
     }
 

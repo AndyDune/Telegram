@@ -17,6 +17,7 @@ use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelsInfoForMessages;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMessage;
 use AndyDune\WebTelegram\Registry;
 use AndyDune\WebTelegram\Request\RequestChannelMessage;
+use Doctrine\ODM\MongoDB\Cursor;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPUnit\Framework\TestCase;
 
@@ -28,6 +29,8 @@ class ChannelMessageOdmTest extends TestCase
         $registry = Registry::getInstance();
         /** @var DocumentManager $dm */
         $dm = $registry->getServiceManager()->get('document_manager');
+
+        $dm->getSchemaManager()->ensureIndexes();
 
         $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
         $base->remove(['name' => ['$in' => ['test_dune_english', 'test_rzn1rzn']]]);
@@ -59,13 +62,34 @@ class ChannelMessageOdmTest extends TestCase
         $message->setIdWithinChannel(12)
             ->setText('Привет все');
 
+        $message = $registry->getServiceManager()->get(ChannelMessages::class);
+        $this->assertTrue(strlen($message->getId()) > 10); // У несохраненной записи уже есть id
+        $message->setChannel($infoChannel);
+        $message->populateForNew();
+        $message->setIdWithinChannel(13)
+            ->setText('Привет все все');
+
+        $message = $registry->getServiceManager()->get(ChannelMessages::class);
+        $this->assertTrue(strlen($message->getId()) > 10); // У несохраненной записи уже есть id
+        $message->populateForNew();
+        $message->setChannel($infoChannelRzn);
+        $message->setIdWithinChannel(12)
+            ->setText('Привет все все');
+
         $dm->flush();
 
-        $this->assertEquals(1, $baseMessages->count(['channelName' => 'test_dune_english']));
+        $this->assertEquals(2, $baseMessages->count(['channelName' => 'test_dune_english']));
 
         /** @var \AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages $repository */
         $repository = $dm->getRepository(ChannelMessages::class);
         $results = $repository->findMessagesOfChannel($infoChannel);
+        $this->assertCount(2, $results);
+
+        $this->assertEquals(1, $baseMessages->count(['channelName' => 'test_rzn1rzn']));
+
+        /** @var \AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages $repository */
+        $repository = $dm->getRepository(ChannelMessages::class);
+        $results = $repository->findMessagesOfChannel($infoChannelRzn);
         $this->assertCount(1, $results);
 
 
@@ -76,8 +100,7 @@ class ChannelMessageOdmTest extends TestCase
         $this->assertEquals('Привет все', $results->getText());
         $this->assertEquals('test_dune_english', $results->getChannelName());
 
-        $dm->clear();
-
+        //$dm->clear();
 
         /** @var \AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages $repository */
         $repository = $dm->getRepository(ChannelMessages::class);
@@ -86,7 +109,17 @@ class ChannelMessageOdmTest extends TestCase
         $this->assertEquals('Привет все', $results->getText());
         $this->assertEquals('test_dune_english', $results->getChannelName());
 
+        $qb = $dm->createQueryBuilder(ChannelMessages::class)
+            ->field('channel')->equals($infoChannel)
+            ->sort('date', 1);
 
+        $qb->hint('channel_1_date_1');
+        $query = $qb->getQuery();
+        /** @var Cursor $result */
+        $result = $query->execute();
+        $result = $result->toArray();
+        $this->assertCount(2, $result);
+        $debug = $query->debug();
     }
 
     public function testChannelInfoFacade()
@@ -98,7 +131,7 @@ class ChannelMessageOdmTest extends TestCase
         $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
         $base->remove(['name' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
 
-        $baseMessages = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_messages');
+        $baseMessages = $dm->getDocumentDatabase(ChannelMessages::class)->selectCollection('channel_messages');
         $baseMessages->remove(['channelName' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
 
         $facade = new \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages($dm);
@@ -109,7 +142,45 @@ class ChannelMessageOdmTest extends TestCase
 
         $this->assertEquals(null, $facade->getMessageWithId(11, false));
 
+        $dm->flush();
+    }
+
+    public function testExtractDataAndSave()
+    {
+        $registry = Registry::getInstance();
+        /** @var DocumentManager $dm */
+        $dm = $registry->getServiceManager()->get('document_manager');
+
+        $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
+        $base->remove(['name' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
+
+        $baseMessages = $dm->getDocumentDatabase(ChannelMessages::class)->selectCollection('channel_messages');
+        $baseMessages->remove(['channelName' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
+
+        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/good.html'));
+
+        $facade = new \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages($dm);
+        $facade->retrieveWithName('test_test');
+        $facade->getChannelInfoDocument()->setLastDateLoadPost();
+
+        $instance = $facade->getMessageWithId(133);
+        $instance->setText($message->getMessageBody());
+        $instance->setViews($message->getMessageViews());
+        $instance->setDate($message->getMessageDate());
+        $instance->setWidgetMessagePhotoLink($message->getMessagePhotoLink());
+        $instance->setDateLoaded();
 
         $dm->flush();
+        $dm->clear();
+
+        $facade = new \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages($dm);
+        $instanceNew = $facade->retrieveWithName('test_test')->getMessageWithId(133);
+
+        $this->assertEquals($instanceNew->getChannelName(), 'test_test');
+        $this->assertEquals($instanceNew->getText(), $message->getMessageBody());
+        $this->assertEquals($instanceNew->getViews(), $message->getMessageViews());
+        $this->assertEquals($instanceNew->getWidgetMessagePhotoLink(), $message->getMessagePhotoLink());
+        $this->assertEquals($instanceNew->getDate()->format('Y-m-d H:i:s'), $message->getMessageDate(true)->format('Y-m-d H:i:s'));
+
     }
 }

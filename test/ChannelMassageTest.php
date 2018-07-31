@@ -39,6 +39,7 @@ class ChannelMassageTest extends TestCase
         $this->assertTrue($message->isSuccess());
         $this->assertEquals('78', $message->getMessageViews());
         $this->assertEquals('2017-06-22T05:38:32+00:00', $message->getMessageDate());
+        $this->assertEquals('22.06.2017 05', $message->getMessageDate(true)->format('d.m.Y H'));
         $this->assertEquals('<b>How she longed to get out of that dark hall</b> — слова <b>how</b> и <b>what</b> используются в начале восклицательных предложений: <i>Как же ей хотелось выбраться из этого темного холла</i>.<br/><br/><b>Why, there’s hardly enough of me</b> — <b>why</b> в начале предложения, выделенное запятой, — это восклицание, выражающее удивление. Переводится словами «ну как же», «в самом деле» и т.д.: <i>В самом деле, от меня едва ли..</i>.<br/><br/><b>enough</b> — достаточно;<br/><b>respectable</b> — приличный<br/><br/><i>Why, there’s hardly enough of me left to make ONE respectable person!</i>',
             $message->getMessageBody());
 

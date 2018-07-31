@@ -12,9 +12,17 @@
 
 namespace AndyDune\WebTelegram\DoctrineOdm\Documents;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\Indexes;
+use Doctrine\ODM\MongoDB\Mapping\Annotations\Index;
 
 
-/** @ODM\Document(collection="channel_messages", repositoryClass="AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages") */
+/** @ODM\Document(collection="channel_messages", repositoryClass="AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages")
+    @Indexes({
+        @Index(keys={"channel"="asc", "date"="desc"}),
+        @Index(keys={"channel"="asc", "date"="asc"}),
+        @Index(keys={"channel"="asc", "idWithinChannel"="asc"})
+      })
+ */
 class ChannelMessages
 {
     /** @ODM\Id */
@@ -120,10 +128,19 @@ class ChannelMessages
 
     /**
      * @param mixed $date
+     * @return $this
      */
-    public function setDate($date): void
+    public function setDate($date): ChannelMessages
     {
+        if (is_string($date)) {
+            try {
+                $date = \DateTime::createFromFormat('Y-m-d\TH:i:sP', $date);
+            } catch (\Exception $e) {
+                $date = new \DateTime();
+            }
+        }
         $this->date = $date;
+        return $this;
     }
 
     /**
@@ -136,10 +153,15 @@ class ChannelMessages
 
     /**
      * @param mixed $dateLoaded
+     * @return $this
      */
-    public function setDateLoaded($dateLoaded): void
+    public function setDateLoaded($dateLoaded = null): ChannelMessages
     {
+        if (!$dateLoaded) {
+            $dateLoaded = new \DateTime();
+        }
         $this->dateLoaded = $dateLoaded;
+        return $this;
     }
 
     /**
@@ -206,6 +228,11 @@ class ChannelMessages
         $this->views = $views;
     }
 
-
+    public function populateForNew()
+    {
+        $this->date = new \DateTime();
+        $this->dateLoaded = new \DateTime();
+        return $this;
+    }
 
 }

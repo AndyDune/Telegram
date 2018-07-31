@@ -55,8 +55,21 @@ class ChannelMessage
     /**
      * @return null
      */
-    public function getMessageDate()
+    public function getMessageDate($toDateTime = false)
     {
+        if (!$this->messageDate) {
+            return null;
+        }
+
+        if ($toDateTime) {
+            try {
+                return \DateTime::createFromFormat('Y-m-d\TH:i:sP', $this->messageDate);
+            } catch (\Exception $e) {
+                return new \DateTime();
+            }
+
+        }
+
         return $this->messageDate;
     }
 
@@ -114,7 +127,6 @@ class ChannelMessage
         if (!preg_match('|<title>Telegram Widget</title>|ui', $html)) {
             $this->errorCode = self::ERROR_BAD_DATA_FORMAT;
             $this->errorMassage = '';
-
             return false;
         }
 

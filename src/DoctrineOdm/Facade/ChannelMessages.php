@@ -61,6 +61,12 @@ class ChannelMessages
         return $this->channelInfoDocument;
     }
 
+    /**
+     * @param $id
+     * @param bool $addOnNotExist
+     * @return \AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessages
+     * @throws \Exception
+     */
     public function getMessageWithId($id, $addOnNotExist = true)
     {
         if (!$this->channelInfoDocument) {
@@ -72,6 +78,7 @@ class ChannelMessages
         $message = $repository->getMessageOfChannel($this->channelInfoDocument, $id);
         if (!$message and $addOnNotExist) {
             $message = new \AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessages();
+            $message->populateForNew();
             $message->setChannel($this->channelInfoDocument)->setIdWithinChannel($id);
             $this->documentManager->persist($message);
         }
