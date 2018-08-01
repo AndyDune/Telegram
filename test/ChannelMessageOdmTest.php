@@ -12,6 +12,7 @@
 
 namespace AndyDuneTest\WebTelegram;
 
+use AndyDune\DateTime\DateTime;
 use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessages;
 use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelsInfoForMessages;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMessage;
@@ -138,11 +139,40 @@ class ChannelMessageOdmTest extends TestCase
 
         $this->assertEquals(null, $facade->retrieveWithName('test_test', false)->getChannelInfoDocument());
 
+        $this->assertEquals([], $facade->retrieveWithName('test_test')->getLastMessages());
+        $dm->flush();
+
         $this->assertEquals('test_test', $facade->retrieveWithName('test_test')->getChannelInfoDocument()->getName());
 
         $this->assertEquals(null, $facade->getMessageWithId(11, false));
 
+        $message = $facade->getMessageWithId(11);
+        $message->setText('Привет');
         $dm->flush();
+
+        $this->assertCount(1, $messages = $facade->retrieveWithName('test_test', false)->getLastMessages());
+        $this->assertEquals(11, current($messages)->getIdWithinChannel());
+
+
+        $message = $facade->getMessageWithId(12);
+        $message->setText('Привет 12');
+        $message->setDate((new DateTime())->add('+ 12 minutes')->getValue());
+
+        $message = $facade->getMessageWithId(13);
+        $message->setText('Привет 13');
+        $dm->flush();
+
+        $this->assertCount(2, $messages = $facade->retrieveWithName('test_test', false)->getLastMessages(2));
+        $this->assertEquals(12, current($messages)->getIdWithinChannel());
+
+
+        $message = $facade->getMessageWithId(12);
+        $message->setDate((new DateTime())->add('- 1 minutes')->getValue());
+        $dm->flush();
+
+        $this->assertCount(1, $messages = $facade->retrieveWithName('test_test', false)->getLastMessages(1));
+        $this->assertEquals(13, current($messages)->getIdWithinChannel());
+
     }
 
     public function testExtractDataAndSave()

@@ -191,10 +191,15 @@ class ChannelsInfoForMessages
 
     /**
      * @param mixed $lastDateCheckChannelExist
+     * @return $this
      */
-    public function setLastDateCheckChannelExist($lastDateCheckChannelExist): void
+    public function setLastDateCheckChannelExist($lastDateCheckChannelExist = null): ChannelsInfoForMessages
     {
+        if (!$lastDateCheckChannelExist) {
+            $lastDateCheckChannelExist = new \DateTime();
+        }
         $this->lastDateCheckChannelExist = $lastDateCheckChannelExist;
+        return $this;
     }
 
     /**
