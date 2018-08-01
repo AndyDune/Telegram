@@ -15,6 +15,9 @@ use Zend\Dom\Document;
 
 class ChannelMessage
 {
+
+    protected $id;
+
     protected $html;
 
     protected $messageBody = null;
@@ -43,6 +46,23 @@ class ChannelMessage
         $this->html = $html;
         $this->success = $this->extract($html);
     }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id): void
+    {
+        $this->id = $id;
+    }
+
 
     /**
      * @return null
