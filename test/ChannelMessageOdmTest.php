@@ -180,6 +180,7 @@ class ChannelMessageOdmTest extends TestCase
         $registry = Registry::getInstance();
         /** @var DocumentManager $dm */
         $dm = $registry->getServiceManager()->get('document_manager');
+        $dm->clear();
 
         $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
         $base->remove(['name' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
@@ -211,6 +212,21 @@ class ChannelMessageOdmTest extends TestCase
         $this->assertEquals($instanceNew->getViews(), $message->getMessageViews());
         $this->assertEquals($instanceNew->getWidgetMessagePhotoLink(), $message->getMessagePhotoLink());
         $this->assertEquals($instanceNew->getDate()->format('Y-m-d H:i:s'), $message->getMessageDate(true)->format('Y-m-d H:i:s'));
+
+        /*
+        $this->assertEquals(null, $facade->getChannelInfoDocument()->getDateInsert());
+        if (!$facade->getChannelInfoDocument()->getDateInsert()) {
+            $facade->getChannelInfoDocument()->setDateInsert(new \DateTime());
+        }
+        */
+
+        $dm->flush();
+        $dm->clear();
+
+
+        $facade = new \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages($dm);
+        $facade->retrieveWithName('test_test');
+        $this->assertInstanceOf(\DateTime::class, $facade->getChannelInfoDocument()->getDateInsert());
 
     }
 }

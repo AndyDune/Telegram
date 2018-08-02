@@ -49,6 +49,7 @@ class ChannelMessages
         $document = $this->documentManager->getRepository(ChannelsInfoForMessages::class)->findOneBy(['name' => $this->normalizeName($name)]);
         if (!$document and $addOnNotExist) {
             $document = new ChannelsInfoForMessages();
+            $document->populateForNew();
             $document->setName($name);
             $this->documentManager->persist($document);
         }

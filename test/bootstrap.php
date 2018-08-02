@@ -32,6 +32,8 @@ $config->setHydratorNamespace('AndyDune\WebTelegram\Hydrators');
 $config->setMetadataDriverImpl(\Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::create([__DIR__ . '/../src/DoctrineOdm/Documents']));
 
 //$cache = $config->getMetadataCacheImpl();
+//$cache = new \Doctrine\Common\Cache\FilesystemCache($doctrineFolder . 'cache');
+//$cache->deleteAll();
 //$config->setMetadataCacheImpl(new \Doctrine\Common\Cache\FilesystemCache($doctrineFolder . 'cache'));
 
 

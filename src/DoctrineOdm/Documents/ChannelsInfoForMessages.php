@@ -70,6 +70,9 @@ class ChannelsInfoForMessages
     /** @ODM\Field(type="int") */
     private $countMessagesPerWeek = 0;
 
+    /** @ODM\Field(type="date") */
+    private $dateInsert;
+
     /**
      * @return mixed
      */
@@ -337,9 +340,26 @@ class ChannelsInfoForMessages
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getDateInsert()
+    {
+        return $this->dateInsert;
+    }
+
+    /**
+     * @param mixed $dateInsert
+     */
+    public function setDateInsert($dateInsert): void
+    {
+        $this->dateInsert = $dateInsert;
+    }
+
 
     public function populateForNew()
     {
+        $this->dateInsert = new \DateTime();
         $this->lastDateLoadPost = new \DateTime();
         $this->lastDateCheckChannelExist = new \DateTime();
         $this->dateToCheckMessagesAfter = new \DateTime();
