@@ -14,6 +14,7 @@ namespace AndyDune\WebTelegram\DoctrineOdm\Documents;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Indexes;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Index;
+use phpDocumentor\Reflection\Types\This;
 
 
 /** @ODM\Document(collection="channel_messages", repositoryClass="AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages")
@@ -44,6 +45,12 @@ class ChannelMessages
 
     /** @ODM\Field(type="date") */
     private $dateLoaded;
+
+    /** @ODM\Field(type="date") */
+    private $dateUpdated;
+
+    /** @ODM\Field(type="int") */
+    private $countUpdates;
 
     /** @ODM\Field(type="bool") */
     private $deleted = false;
@@ -221,16 +228,71 @@ class ChannelMessages
         return $this->views;
     }
 
+    public function markUpdate()
+    {
+        $this->countUpdates = (int)$this->countUpdates + 1;
+        $this->dateUpdated = new \DateTime();
+        return $this;
+    }
+
+    /**
+     * @param mixed $dateUpdated
+     * @return $this
+     */
+    public function setDateUpdated($dateUpdated): ChannelMessages
+    {
+        if (is_string($dateUpdated)) {
+            try {
+                $dateUpdated = \DateTime::createFromFormat('Y-m-d\TH:i:sP', $dateUpdated);
+            } catch (\Exception $e) {
+                $dateUpdated = new \DateTime();
+            }
+        }
+
+        $this->dateUpdated = $dateUpdated;
+        return $this;
+    }
+
+    /**
+     * @param mixed $countUpdates
+     * @return $this
+     */
+    public function setCountUpdates($countUpdates): ChannelMessages
+    {
+        $this->countUpdates = $countUpdates;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateUpdated()
+    {
+        return $this->dateUpdated;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCountUpdates()
+    {
+        return $this->countUpdates;
+    }
+
+
     /**
      * @param mixed $views
+     * @return $this
      */
-    public function setViews($views): void
+    public function setViews($views): ChannelMessages
     {
         $this->views = $views;
+        return $this;
     }
 
     public function populateForNew()
     {
+        $this->countUpdates = 0;
         $this->date = new \DateTime();
         $this->dateLoaded = new \DateTime();
         return $this;
