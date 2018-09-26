@@ -170,8 +170,32 @@ class ChannelMessageOdmTest extends TestCase
         $message->setDate((new DateTime())->add('- 1 minutes')->getValue());
         $dm->flush();
 
-        $this->assertCount(1, $messages = $facade->retrieveWithName('test_test', false)->getLastMessages(1));
-        $this->assertEquals(13, current($messages)->getIdWithinChannel());
+        $messages = $facade->retrieveWithName('test_test', false)->getLastMessages(1);
+        $this->assertCount(1, $messages);
+        $oneMessage = current($messages);
+        $this->assertEquals(13, $oneMessage->getIdWithinChannel());
+
+        $oneMessage->setDeleted(true);
+        $dm->flush();
+
+        $messages = $facade->retrieveWithName('test_test', false)->getLastMessages(1);
+        $this->assertCount(1, $messages);
+        $oneMessage = current($messages);
+        $this->assertEquals(13, $oneMessage->getIdWithinChannel());
+
+        $messages = $facade->retrieveWithName('test_test', false)->getLastMessages(5, true);
+        $this->assertCount(2, $messages);
+        $oneMessage = current($messages);
+        $this->assertEquals(11, $oneMessage->getIdWithinChannel());
+
+        $oneMessage->setDeleted(true);
+        $dm->flush();
+
+
+        $messages = $facade->retrieveWithName('test_test', false)->getLastMessages(5, true);
+        $this->assertCount(1, $messages);
+        $oneMessage = current($messages);
+        $this->assertEquals(12, $oneMessage->getIdWithinChannel());
 
     }
 
@@ -181,6 +205,7 @@ class ChannelMessageOdmTest extends TestCase
         /** @var DocumentManager $dm */
         $dm = $registry->getServiceManager()->get('document_manager');
         $dm->clear();
+        $dm->getSchemaManager()->ensureIndexes();
 
         $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
         $base->remove(['name' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);

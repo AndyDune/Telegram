@@ -57,7 +57,7 @@ class ChannelMessages
         return $this;
     }
 
-    public function getLastMessages($limit = 20)
+    public function getLastMessages($limit = 20, $noDeleted = false)
     {
         if (!$this->channelInfoDocument) {
             throw new \Exception('Вызовите сначала метод retrieveWithName');
@@ -65,7 +65,11 @@ class ChannelMessages
         /** @var \AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages $repository */
         $repository = $this->documentManager
             ->getRepository(\AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessages::class);
-        return $repository->setSortByDate(-1)->setLimit($limit)->findMessagesOfChannel($this->channelInfoDocument);
+        $repository->setSortByDate(-1)->setLimit($limit);
+        if ($noDeleted) {
+            return $repository->findMessagesOfChannelNotDeleted($this->channelInfoDocument);
+        }
+        return $repository->findMessagesOfChannel($this->channelInfoDocument);
     }
 
     public function getChannelInfoDocument()

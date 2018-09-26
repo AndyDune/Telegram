@@ -72,6 +72,7 @@ class ChannelInfo
             $this->errorMassage = $e->getCode(). ' : '. $e->getMessage();
             return false;
         }
+        return true;
     }
 
     /**

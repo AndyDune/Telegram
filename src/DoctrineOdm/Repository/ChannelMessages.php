@@ -61,6 +61,18 @@ class ChannelMessages extends DocumentRepository
         return $this->findBy(['channel' => $channel], $this->sort, $this->limit, $this->skip);
     }
 
+
+    /**
+     * @param ChannelsInfoForMessages $channel
+     * @param int $limit
+     * @param int $skip
+     * @return array
+     */
+    public function findMessagesOfChannelNotDeleted(ChannelsInfoForMessages $channel)
+    {
+        return $this->findBy(['channel' => $channel, 'deleted' => false], $this->sort, $this->limit, $this->skip);
+    }
+
     /**
      * @param ChannelsInfoForMessages $channel
      * @param int $limit

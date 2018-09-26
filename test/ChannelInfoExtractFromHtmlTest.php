@@ -19,7 +19,7 @@ class ChannelInfoExtractFromHtmlTest extends TestCase
 {
     public function testSuccessExtract()
     {
-        $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/normal.html.html'));
-        $this->assertTrue($info);
+        $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/normal.html'));
+        $this->assertTrue($info->isSuccess());
     }
 }

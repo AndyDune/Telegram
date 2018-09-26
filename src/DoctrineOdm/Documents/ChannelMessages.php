@@ -19,6 +19,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations\Index;
 /** @ODM\Document(collection="channel_messages", repositoryClass="AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages")
     @Indexes({
         @Index(keys={"channel"="asc", "date"="desc"}),
+        @Index(keys={"channel"="asc", "deleted"="asc", "date"="desc"}),
         @Index(keys={"channel"="asc", "date"="asc"}),
         @Index(keys={"channel"="asc", "idWithinChannel"="asc"})
       })
