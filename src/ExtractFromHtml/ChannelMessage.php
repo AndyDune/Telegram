@@ -25,6 +25,8 @@ class ChannelMessage
     protected $messageViews = null;
     protected $messagePhotoLink = null;
 
+    protected $messageVoice = null;
+
     protected $success;
 
     protected $errorCode = null;
@@ -40,6 +42,9 @@ class ChannelMessage
     protected $tagPathForDate = 'div.tgme_widget_message_info time';
     protected $tagPathForError = 'div.tgme_widget_message_error';
     protected $tagPathForMessagePhoto = 'a.tgme_widget_message_photo_wrap';
+
+    //https://t.me/shomalmuzic/5636?embed=1
+    protected $tagPathForMessageVoice = 'audio.tgme_widget_message_voice';
 
     public function __construct($html)
     {
@@ -133,6 +138,14 @@ class ChannelMessage
         return $this->messagePhotoLink;
     }
 
+    /**
+     * @return null
+     */
+    public function getMessageVoice()
+    {
+        return $this->messageVoice;
+    }
+
 
     /**
      * https://docs.zendframework.com/zend-dom/query/
@@ -186,6 +199,15 @@ class ChannelMessage
             /** @var \DOMNodeList $content */
             $content = current($res);
             $this->messageViews = $content->item(0)->nodeValue;
+            $findInfoCountFind++;
+        }
+
+        $res = Document\Query::execute($this->tagPathForMessageVoice, $doc, Document\Query::TYPE_CSS);
+        $res->count();
+        if ($res->count()) {
+            /** @var \DOMNodeList $content */
+            $content = current($res);
+            $this->messageVoice = $content->item(0)->getAttribute('src');
             $findInfoCountFind++;
         }
 

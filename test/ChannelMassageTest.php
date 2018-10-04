@@ -65,6 +65,11 @@ class ChannelMassageTest extends TestCase
             $message->getMessagePhotoLink());
         $this->assertEquals('',
             $message->getMessageBody());
+
+        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/widget_message_voice.html'));
+        $this->assertTrue($message->isSuccess());
+        $this->assertEquals('https://cdn5.telesco.pe/file/nNTrF9bYwr8i1uSs3ZCyoTzmIAxVQ8rVuouLkW-d4FHcU7zf4WMrJJwjuQFDjLjmeFWh93t85mvVL-uX7K9PiREZEFwAbEf-5lJ5zwssYLvRE7lSgf_Hy-3rSYD8xdp-Lj9IdXE5uN788_uh_3YG8WTJQRewL2hqY3VjgYr7qw1rAdb6LrTOt-iCQu0CJg9HrJh69aI6eYo8JdS0txgVXxJfYJEuu5NId5RsVF5PgLAIEoWoL94aZX5BrYZUt7LqJKeBPhY6CrBkkdl_X0w9DAaTvTA4cPJWjUkOsW7c0-6J8fmTs-kpRavRaPOdU9L-ZrT-hH16-jQFj0UQFquOmg.ogg', $message->getMessageVoice());
+
     }
 
 
