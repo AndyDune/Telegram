@@ -15,6 +15,7 @@ namespace AndyDune\WebTelegram\ExtractFromHtml;
 
 class ChannelMention
 {
-
+    protected $rules = [];
+    protected $checks = [];
 
 }

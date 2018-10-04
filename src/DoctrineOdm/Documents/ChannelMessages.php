@@ -64,6 +64,9 @@ class ChannelMessages
     /** @ODM\Field(type="int") */
     private $views = 0;
 
+    /** @ODM\EmbedOne(targetDocument="ChannelMessagesVersions") */
+    private $versions;
+
     /**
      * @return mixed
      */
@@ -71,6 +74,28 @@ class ChannelMessages
     {
         return $this->id;
     }
+
+    /**
+     * @return ChannelMessagesVersions
+     */
+    public function getVersions()
+    {
+        if (!$this->versions) {
+            $this->versions = new ChannelMessagesVersions();
+        }
+        return $this->versions;
+    }
+
+    /**
+     * @param ChannelMessagesVersions $versions
+     * @return $this
+     */
+    public function setVersions(ChannelMessagesVersions $versions) : ChannelMessages
+    {
+        $this->versions = $versions;
+        return $this;
+    }
+
 
 
     /**
@@ -279,7 +304,6 @@ class ChannelMessages
         return $this->countUpdates;
     }
 
-
     /**
      * @param mixed $views
      * @return $this
@@ -295,6 +319,7 @@ class ChannelMessages
         $this->countUpdates = 0;
         $this->date = new \DateTime();
         $this->dateLoaded = new \DateTime();
+        $this->versions = new ChannelMessagesVersions();
         return $this;
     }
 

@@ -121,6 +121,29 @@ class ChannelMessageOdmTest extends TestCase
         $result = $result->toArray();
         $this->assertCount(2, $result);
         $debug = $query->debug();
+
+        $message = $registry->getServiceManager()->get(ChannelMessages::class);
+        $message->populateForNew();
+        $message->setChannel($infoChannelRzn);
+        $message->setIdWithinChannel(123)
+            ->setText('Имеет версии');
+
+        $versions = $message->getVersions();
+        $versions->setFindChannel(1);
+        $versions->setFindSticker(3);
+        $dm->flush();
+
+        $dm->clear();
+
+        /** @var \AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages $repository */
+        $repository = $dm->getRepository(ChannelMessages::class);
+        $message = $repository->getMessageOfChannelWithName('test_rzn1rzn', 123);
+        $this->assertInstanceOf(ChannelMessages::class, $message);
+        $versions = $message->getVersions();
+        $this->assertEquals(1, $versions->getFindChannel());
+        $this->assertEquals(3, $versions->getFindSticker());
+
+
     }
 
     public function testChannelInfoFacade()
