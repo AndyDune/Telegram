@@ -13,9 +13,33 @@
 namespace AndyDune\WebTelegram\ExtractFromHtml;
 
 
+use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\TmeLink;
+use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\IsNotBot;
+
 class ChannelMention
 {
-    protected $rules = [];
-    protected $checks = [];
+    protected $rules = [
+        TmeLink::class
+    ];
+
+    protected $checks = [
+        IsNotBot::class
+    ];
+
+    protected function getRules()
+    {
+        foreach($this->rules as $key =>  $rule) {
+            if (is_string($rule)) {
+                $rule = new $rule;
+                $this->rules[$key] = $rule;
+            }
+        }
+        return $this->rules;
+    }
+
+    public function handle($text)
+    {
+
+    }
 
 }
