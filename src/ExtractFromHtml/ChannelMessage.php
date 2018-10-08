@@ -24,6 +24,7 @@ class ChannelMessage
     protected $messageDate = null;
     protected $messageViews = null;
     protected $messagePhotoLink = null;
+    protected $messageSticker = null;
 
     protected $messageVoice = null;
 
@@ -45,6 +46,9 @@ class ChannelMessage
 
     //https://t.me/shomalmuzic/5636?embed=1
     protected $tagPathForMessageVoice = 'audio.tgme_widget_message_voice';
+
+    // https://t.me/nim_ru/2021?embed=1
+    protected $tagPathForSticker = 'a.message_media_view_in_telegram';
 
     public function __construct($html)
     {
@@ -146,6 +150,14 @@ class ChannelMessage
         return $this->messageVoice;
     }
 
+    /**
+     * @return null|string
+     */
+    public function getMessageSticker()
+    {
+        return $this->messageSticker;
+    }
+
 
     /**
      * https://docs.zendframework.com/zend-dom/query/
@@ -210,6 +222,16 @@ class ChannelMessage
             $this->messageVoice = $content->item(0)->getAttribute('src');
             $findInfoCountFind++;
         }
+
+        $res = Document\Query::execute($this->tagPathForSticker, $doc, Document\Query::TYPE_CSS);
+        $res->count();
+        if ($res->count()) {
+            /** @var \DOMNodeList $content */
+            $content = current($res);
+            $this->messageSticker = $content->item(0)->getAttribute('href');
+            $findInfoCountFind++;
+        }
+
 
         $res = Document\Query::execute($this->tagPathForDate, $doc, Document\Query::TYPE_CSS);
         $res->count();

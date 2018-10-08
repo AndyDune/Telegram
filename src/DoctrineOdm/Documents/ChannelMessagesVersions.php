@@ -22,6 +22,10 @@ class ChannelMessagesVersions
     /** @ODM\Field(type="int") */
     protected $findSticker;
 
+    /** @ODM\Field(type="int") */
+    protected $updated;
+
+
     /**
      * @return mixed
      */
@@ -57,5 +61,25 @@ class ChannelMessagesVersions
         $this->findSticker = $findSticker;
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * @param mixed $updated
+     * @return $this
+     */
+    public function setUpdated($updated): ChannelMessagesVersions
+    {
+        $this->updated = $updated;
+        return $this;
+    }
+
+
 
 }

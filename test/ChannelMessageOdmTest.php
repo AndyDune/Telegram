@@ -60,7 +60,7 @@ class ChannelMessageOdmTest extends TestCase
         $message = $registry->getServiceManager()->get(ChannelMessages::class);
         $this->assertTrue(strlen($message->getId()) > 10); // У несохраненной записи уже есть id
         $message->setChannel($infoChannel);
-        $message->setIdWithinChannel(12)
+        $message->setIdWithinChannel(12)->setWidgetMessageVoice('ссылка на файл 12')
             ->setText('Привет все');
 
         $message = $registry->getServiceManager()->get(ChannelMessages::class);
@@ -68,7 +68,7 @@ class ChannelMessageOdmTest extends TestCase
         $message->setChannel($infoChannel);
         $message->populateForNew();
         $message->setIdWithinChannel(13)
-            ->setText('Привет все все');
+            ->setText('Привет все все')->setWidgetMessageVoice('ссылка на файл 13');
 
         $message = $registry->getServiceManager()->get(ChannelMessages::class);
         $this->assertTrue(strlen($message->getId()) > 10); // У несохраненной записи уже есть id
@@ -99,6 +99,7 @@ class ChannelMessageOdmTest extends TestCase
         $results = $repository->getMessageOfChannel($infoChannel, 12);
         $this->assertInstanceOf(ChannelMessages::class, $results);
         $this->assertEquals('Привет все', $results->getText());
+        $this->assertEquals('ссылка на файл 12', $results->getWidgetMessageVoice());
         $this->assertEquals('test_dune_english', $results->getChannelName());
 
         //$dm->clear();
@@ -130,7 +131,7 @@ class ChannelMessageOdmTest extends TestCase
 
         $versions = $message->getVersions();
         $versions->setFindChannel(1);
-        $versions->setFindSticker(3);
+        $versions->setFindSticker(3)->setUpdated(5);
         $dm->flush();
 
         $dm->clear();
@@ -142,8 +143,7 @@ class ChannelMessageOdmTest extends TestCase
         $versions = $message->getVersions();
         $this->assertEquals(1, $versions->getFindChannel());
         $this->assertEquals(3, $versions->getFindSticker());
-
-
+        $this->assertEquals(5, $versions->getUpdated());
     }
 
     public function testChannelInfoFacade()

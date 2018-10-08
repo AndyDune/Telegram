@@ -61,11 +61,35 @@ class ChannelMessages
     /** @ODM\Field(type="string") */
     private $widgetMessagePhotoLink = '';
 
+    /** @ODM\Field(type="string") */
+    private $widgetMessageVoice = '';
+
     /** @ODM\Field(type="int") */
     private $views = 0;
 
     /** @ODM\EmbedOne(targetDocument="ChannelMessagesVersions") */
     private $versions;
+
+    /**
+     * @ODM\Field(type="boolean")
+     */
+    private $contentTypeText = false;
+
+    /**
+     * @ODM\Field(type="boolean")
+     */
+    private $contentTypePhoto = false;
+
+    /**
+     * @ODM\Field(type="boolean")
+     */
+    private $contentTypeVoice = false;
+
+    /**
+     * @ODM\Field(type="boolean")
+     */
+    private $contentTypeSticker = false;
+
 
     /**
      * @return mixed
@@ -74,6 +98,80 @@ class ChannelMessages
     {
         return $this->id;
     }
+
+    /**
+     * @return mixed
+     */
+    public function isContentTypeText()
+    {
+        return $this->contentTypeText;
+    }
+
+    /**
+     * @param mixed $contentTypeText
+     * @return $this
+     */
+    public function setContentTypeText($contentTypeText): ChannelMessages
+    {
+        $this->contentTypeText = (bool)$contentTypeText;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isContentTypePhoto()
+    {
+        return $this->contentTypePhoto;
+    }
+
+    /**
+     * @param mixed $contentTypePhoto
+     * @return $this
+     */
+    public function setContentTypePhoto($contentTypePhoto): ChannelMessages
+    {
+        $this->contentTypePhoto = (bool)$contentTypePhoto;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isContentTypeVoice()
+    {
+        return $this->contentTypeVoice;
+    }
+
+    /**
+     * @param mixed $contentTypeVoice
+     * @return $this
+     */
+    public function setContentTypeVoice($contentTypeVoice): ChannelMessages
+    {
+        $this->contentTypeVoice = (bool)$contentTypeVoice;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isContentTypeSticker() : bool
+    {
+        return $this->contentTypeSticker;
+    }
+
+    /**
+     * @param mixed $contentTypeSticker
+     * @return $this
+     */
+    public function setContentTypeSticker($contentTypeSticker): ChannelMessages
+    {
+        $this->contentTypeSticker = (bool)$contentTypeSticker;
+        return $this;
+    }
+
+
 
     /**
      * @return ChannelMessagesVersions
@@ -96,6 +194,23 @@ class ChannelMessages
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getWidgetMessageVoice()
+    {
+        return $this->widgetMessageVoice;
+    }
+
+    /**
+     * @param mixed $widgetMessageVoice
+     * @return $this
+     */
+    public function setWidgetMessageVoice($widgetMessageVoice): ChannelMessages
+    {
+        $this->widgetMessageVoice = $widgetMessageVoice;
+        return $this;
+    }
 
 
     /**
@@ -223,10 +338,12 @@ class ChannelMessages
 
     /**
      * @param mixed $text
+     * @return $this
      */
-    public function setText($text): void
+    public function setText($text): ChannelMessages
     {
         $this->text = $text;
+        return $this;
     }
 
     /**

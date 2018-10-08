@@ -9,17 +9,18 @@
  *
  */
 
-
 namespace AndyDune\WebTelegram\ExtractFromHtml;
 
 
+use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\JoinLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\TmeLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\IsNotBot;
 
 class ChannelMention
 {
     protected $rules = [
-        TmeLink::class
+        TmeLink::class,
+        JoinLink::class
     ];
 
     protected $checks = [
@@ -41,5 +42,4 @@ class ChannelMention
     {
 
     }
-
 }
