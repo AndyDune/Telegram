@@ -64,6 +64,9 @@ class ChannelMessages
     /** @ODM\Field(type="string") */
     private $widgetMessageVoice = '';
 
+    /** @ODM\Field(type="string") */
+    private $widgetMessageSticker = '';
+
     /** @ODM\Field(type="int") */
     private $views = 0;
 
@@ -111,7 +114,7 @@ class ChannelMessages
      * @param mixed $contentTypeText
      * @return $this
      */
-    public function setContentTypeText($contentTypeText): ChannelMessages
+    public function setContentTypeText($contentTypeText = true): ChannelMessages
     {
         $this->contentTypeText = (bool)$contentTypeText;
         return $this;
@@ -129,7 +132,7 @@ class ChannelMessages
      * @param mixed $contentTypePhoto
      * @return $this
      */
-    public function setContentTypePhoto($contentTypePhoto): ChannelMessages
+    public function setContentTypePhoto($contentTypePhoto = true): ChannelMessages
     {
         $this->contentTypePhoto = (bool)$contentTypePhoto;
         return $this;
@@ -147,7 +150,7 @@ class ChannelMessages
      * @param mixed $contentTypeVoice
      * @return $this
      */
-    public function setContentTypeVoice($contentTypeVoice): ChannelMessages
+    public function setContentTypeVoice($contentTypeVoice = true): ChannelMessages
     {
         $this->contentTypeVoice = (bool)$contentTypeVoice;
         return $this;
@@ -165,13 +168,11 @@ class ChannelMessages
      * @param mixed $contentTypeSticker
      * @return $this
      */
-    public function setContentTypeSticker($contentTypeSticker): ChannelMessages
+    public function setContentTypeSticker($contentTypeSticker = true): ChannelMessages
     {
         $this->contentTypeSticker = (bool)$contentTypeSticker;
         return $this;
     }
-
-
 
     /**
      * @return ChannelMessagesVersions
@@ -208,6 +209,7 @@ class ChannelMessages
      */
     public function setWidgetMessageVoice($widgetMessageVoice): ChannelMessages
     {
+        $this->setContentTypeVoice();
         $this->widgetMessageVoice = $widgetMessageVoice;
         return $this;
     }
@@ -342,6 +344,7 @@ class ChannelMessages
      */
     public function setText($text): ChannelMessages
     {
+        $this->setContentTypeText();
         $this->text = $text;
         return $this;
     }
@@ -356,11 +359,35 @@ class ChannelMessages
 
     /**
      * @param mixed $widgetMessagePhotoLink
+     * @return $this
      */
-    public function setWidgetMessagePhotoLink($widgetMessagePhotoLink): void
+    public function setWidgetMessagePhotoLink($widgetMessagePhotoLink): ChannelMessages
     {
+        $this->setContentTypePhoto();
         $this->widgetMessagePhotoLink = $widgetMessagePhotoLink;
+        return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getWidgetMessageSticker()
+    {
+        return $this->widgetMessageSticker;
+    }
+
+    /**
+     * @param mixed $widgetMessageSticker
+     * @return $this
+     */
+    public function setWidgetMessageSticker($widgetMessageSticker): ChannelMessages
+    {
+        $this->setContentTypeSticker();
+        $this->widgetMessageSticker = $widgetMessageSticker;
+        return $this;
+    }
+
+
 
     /**
      * @return mixed

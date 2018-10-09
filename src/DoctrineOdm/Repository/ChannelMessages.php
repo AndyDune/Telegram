@@ -73,6 +73,15 @@ class ChannelMessages extends DocumentRepository
         return $this->findBy(['channel' => $channel, 'deleted' => false], $this->sort, $this->limit, $this->skip);
     }
 
+    public function deleteChannel(ChannelsInfoForMessages $channel)
+    {
+        $queryBuilder =  $this->createQueryBuilder()->remove();
+        return $queryBuilder->field('channel')->equals($channel)
+            ->getQuery()
+            ->execute();
+    }
+
+
     /**
      * @param ChannelsInfoForMessages $channel
      * @param int $limit

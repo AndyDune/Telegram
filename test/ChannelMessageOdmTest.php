@@ -220,6 +220,23 @@ class ChannelMessageOdmTest extends TestCase
         $oneMessage = current($messages);
         $this->assertEquals(12, $oneMessage->getIdWithinChannel());
 
+        $messages = $facade->getChannelMessagesRepository()->findBy(['channelName' => 'test_test']);
+        $this->assertCount(3, $messages);
+
+        $info = $facade->retrieveWithName('test_test')->getChannelInfoDocument();
+        $this->assertInstanceOf(ChannelsInfoForMessages::class, $info);
+        $result = $facade->deleteChannelWithName('test_test');
+        $this->assertEquals(true, $result);
+
+        // Так делать уже нельзя - хапись в базе удалена
+        //$messages = $facade->getChannelMessagesRepository()->findMessagesOfChannel($info);
+
+        $messages = $facade->getChannelMessagesRepository()->findBy(['channelName' => 'test_test']);
+        $this->assertCount(0, $messages);
+
+        $messagesInfo = $facade->retrieveWithName('test_test', false)->getChannelInfoDocument();
+        $this->assertEquals(null, $messagesInfo);
+
     }
 
     public function testExtractDataAndSave()
@@ -277,4 +294,74 @@ class ChannelMessageOdmTest extends TestCase
         $this->assertInstanceOf(\DateTime::class, $facade->getChannelInfoDocument()->getDateInsert());
 
     }
+
+    public function testExtractDataAndSaveUseFacade()
+    {
+        $registry = Registry::getInstance();
+        /** @var DocumentManager $dm */
+        $dm = $registry->getServiceManager()->get('document_manager');
+        $dm->clear();
+        $dm->getSchemaManager()->ensureIndexes();
+
+        $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
+        $base->remove(['name' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
+
+        $baseMessages = $dm->getDocumentDatabase(ChannelMessages::class)->selectCollection('channel_messages');
+        $baseMessages->remove(['channelName' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
+
+
+        $facade = new \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages($dm);
+        $info = $facade->retrieveWithName('test_test')->getChannelInfoDocument();
+
+        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/good.html'));
+        $message->setId(13);
+        $facade->fillMessageInstanceWithExtractedData($message);
+
+        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/good_photo.html'));
+        $message->setId(14);
+        $facade->fillMessageInstanceWithExtractedData($message);
+
+        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/message_with_sticker.html'));
+        $message->setId(15);
+        $facade->fillMessageInstanceWithExtractedData($message);
+
+        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/widget_message_voice.html'));
+        $message->setId(16);
+        $facade->fillMessageInstanceWithExtractedData($message);
+
+        $dm->clear();
+
+        $info = $facade->retrieveWithName('test_test', false)->getChannelInfoDocument();
+        $list = $facade->getChannelMessagesRepository()->findBy(['channel' => $info]);
+        $listIdKey = [];
+        /** @var ChannelMessages $row */
+        foreach ($list as $row) {
+            $listIdKey[$row->getIdWithinChannel()] = $row;
+        }
+
+        $this->assertCount(4, $listIdKey);
+
+        $this->assertTrue($listIdKey[13]->isContentTypeText());
+        $this->assertFalse($listIdKey[14]->isContentTypeText());
+        $this->assertFalse($listIdKey[15]->isContentTypeText());
+        $this->assertFalse($listIdKey[16]->isContentTypeText());
+
+        $this->assertFalse($listIdKey[13]->isContentTypePhoto());
+        $this->assertTrue($listIdKey[14]->isContentTypePhoto());
+        $this->assertFalse($listIdKey[15]->isContentTypePhoto());
+        $this->assertFalse($listIdKey[16]->isContentTypePhoto());
+
+        $this->assertFalse($listIdKey[13]->isContentTypeSticker());
+        $this->assertFalse($listIdKey[14]->isContentTypeSticker());
+        $this->assertTrue($listIdKey[15]->isContentTypeSticker());
+        $this->assertFalse($listIdKey[16]->isContentTypeSticker());
+
+        $this->assertFalse($listIdKey[13]->isContentTypeVoice());
+        $this->assertFalse($listIdKey[14]->isContentTypeVoice());
+        $this->assertFalse($listIdKey[15]->isContentTypeVoice());
+        $this->assertTrue($listIdKey[16]->isContentTypeVoice());
+
+
+    }
+
 }

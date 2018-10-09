@@ -13,9 +13,12 @@
 namespace AndyDune\WebTelegram\DoctrineOdm\Facade;
 
 
+use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessagesVersions;
 use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelsInfoForMessages;
+use AndyDune\WebTelegram\ExtractFromHtml\ChannelMessage;
 use AndyDune\WebTelegram\Format\NormalizeName;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 
 class ChannelMessages
 {
@@ -46,7 +49,8 @@ class ChannelMessages
      */
     public function retrieveWithName($name, $addOnNotExist = true)
     {
-        $document = $this->documentManager->getRepository(ChannelsInfoForMessages::class)->findOneBy(['name' => $this->normalizeName($name)]);
+        $this->channelInfoDocument = null;
+        $document = $this->getChannelInfoRepository()->findOneBy(['name' => $this->normalizeName($name)]);
         if (!$document and $addOnNotExist) {
             $document = new ChannelsInfoForMessages();
             $document->populateForNew();
@@ -55,6 +59,48 @@ class ChannelMessages
         }
         $this->channelInfoDocument = $document;
         return $this;
+    }
+
+    public function deleteChannelWithName($name)
+    {
+        /** @var DocumentRepository  $repo */
+        $repo = $this->getChannelInfoRepository();
+        /** @var ChannelsInfoForMessages  $document */
+        $document = $repo->findOneBy(['name' => $this->normalizeName($name)]);
+        if (!$document) {
+            return false;
+        }
+        $repo->getDocumentManager()->remove($document);
+        /** @var \AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages $repo */
+        $repo = $this->getChannelMessagesRepository();
+        /**
+         * arrray[
+         * ok => 1
+         * n = 3
+         * err = null
+         * ermsg = null
+         * ]
+         */
+        $result = $repo->deleteChannel($document);
+        $repo->getDocumentManager()->flush();
+        return true;
+    }
+
+
+    /**
+     * @return \Doctrine\Common\Persistence\ObjectRepository
+     */
+    public function getChannelInfoRepository()
+    {
+        return $this->documentManager->getRepository(ChannelsInfoForMessages::class);
+    }
+
+    /**
+     * @return \AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages
+     */
+    public function getChannelMessagesRepository()
+    {
+        return $this->documentManager->getRepository(\AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessages::class);
     }
 
     public function getLastMessages($limit = 20, $noDeleted = false)
@@ -75,6 +121,47 @@ class ChannelMessages
     public function getChannelInfoDocument()
     {
         return $this->channelInfoDocument;
+    }
+
+    public function fillMessageInstanceWithExtractedData(ChannelMessage $extractor)
+    {
+        if (!$extractor->isSuccess()) {
+            return false;
+        }
+
+        $channelMessage = $this->getMessageWithId($extractor->getId());
+
+        $channelMessage->setViews($extractor->getMessageViews());
+        $channelMessage->setDate($extractor->getMessageDate());
+
+        if ($content = $extractor->getMessageBody()) {
+            $channelMessage->setText($content);
+        }
+
+        if ($content = $extractor->getMessagePhotoLink()) {
+            $pathInfo = parse_url($content);
+            if (isset($pathInfo['host'])) {
+                $channelMessage->setWidgetMessagePhotoLink($pathInfo['host']);
+            } else {
+                $channelMessage->setWidgetMessagePhotoLink('temp_link');
+            }
+        }
+
+        if ($content = $extractor->getMessageSticker()) {
+            $channelMessage->setWidgetMessageSticker($content);
+        }
+
+        if ($content = $extractor->getMessageVoice()) {
+            $pathInfo = parse_url($content);
+            if (isset($pathInfo['host'])) {
+                $channelMessage->setWidgetMessageVoice($pathInfo['host']);
+            } else {
+                $channelMessage->setWidgetMessageVoice('temp_link');
+            }
+        }
+
+        $this->getChannelMessagesRepository()->getDocumentManager()->flush();
+        return true;
     }
 
     /**
