@@ -82,6 +82,25 @@ class ChannelMessages extends DocumentRepository
     }
 
 
+    public function getMessagesCheckVersionLessThen($version = 1, $limit = 10, $noDeleted = true)
+    {
+/*
+        $queryBuilder =  $this->createQueryBuilder();
+        return $queryBuilder->field('versions.checked')->lt($version)
+            ->limit($limit)
+            ->getQuery()
+            ->execute()->toArray();
+*/
+        $query = ['$or' => [['versions.checked' => ['$lt' => $version]], ['versions.checked' => null]]];
+        //$query = ['versions.checked' => ['$lt' => $version], 'versions.checked' => null];
+        //$query = ['versions' => ['checked' => ['$lt' => $version]]];
+        if ($noDeleted) {
+            $query['deleted'] = false;
+        }
+        return $this->findBy($query, null, $limit);
+    }
+
+
     /**
      * @param ChannelsInfoForMessages $channel
      * @param int $limit

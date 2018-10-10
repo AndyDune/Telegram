@@ -25,6 +25,9 @@ class ChannelMessagesVersions
     /** @ODM\Field(type="int") */
     protected $updated;
 
+    /** @ODM\Field(type="int") */
+    protected $checked;
+
 
     /**
      * @return mixed
@@ -80,6 +83,22 @@ class ChannelMessagesVersions
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getChecked()
+    {
+        return $this->checked;
+    }
 
+    /**
+     * @param mixed $checked
+     * @return $this
+     */
+    public function setChecked($checked): ChannelMessagesVersions
+    {
+        $this->checked = $checked;
+        return $this;
+    }
 
 }

@@ -464,6 +464,7 @@ class ChannelMessages
         $this->date = new \DateTime();
         $this->dateLoaded = new \DateTime();
         $this->versions = new ChannelMessagesVersions();
+        $this->versions->setChecked(0);
         return $this;
     }
 

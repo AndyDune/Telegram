@@ -14,6 +14,7 @@ namespace AndyDuneTest\WebTelegram;
 
 use AndyDune\DateTime\DateTime;
 use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessages;
+use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessagesVersions;
 use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelsInfoForMessages;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMessage;
 use AndyDune\WebTelegram\Registry;
@@ -333,6 +334,7 @@ class ChannelMessageOdmTest extends TestCase
 
         $info = $facade->retrieveWithName('test_test', false)->getChannelInfoDocument();
         $list = $facade->getChannelMessagesRepository()->findBy(['channel' => $info]);
+        /** @var ChannelMessages[] $listIdKey */
         $listIdKey = [];
         /** @var ChannelMessages $row */
         foreach ($list as $row) {
@@ -340,6 +342,11 @@ class ChannelMessageOdmTest extends TestCase
         }
 
         $this->assertCount(4, $listIdKey);
+
+        $listIdKey[13]->getVersions()->setChecked(1);
+        $dm->flush();
+        $this->assertEquals(1, $listIdKey[13]->getVersions()->getChecked());
+
 
         $this->assertTrue($listIdKey[13]->isContentTypeText());
         $this->assertFalse($listIdKey[14]->isContentTypeText());
@@ -361,7 +368,69 @@ class ChannelMessageOdmTest extends TestCase
         $this->assertFalse($listIdKey[15]->isContentTypeVoice());
         $this->assertTrue($listIdKey[16]->isContentTypeVoice());
 
+    }
 
+    public function testFindWithVersionLowerFacade()
+    {
+        $registry = Registry::getInstance();
+        /** @var DocumentManager $dm */
+        $dm = $registry->getServiceManager()->get('document_manager');
+        $dm->clear();
+        $dm->getSchemaManager()->ensureIndexes();
+
+        $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
+        $base->remove(['name' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
+
+        $baseMessages = $dm->getDocumentDatabase(ChannelMessages::class)->selectCollection('channel_messages');
+        $baseMessages->remove(['channelName' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
+
+
+        $facade = new \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages($dm);
+        $info = $facade->retrieveWithName('test_test')->getChannelInfoDocument();
+
+        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/good.html'));
+        $message->setId(1);
+        $facade->fillMessageInstanceWithExtractedData($message);
+
+        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/good_photo.html'));
+        $message->setId(2);
+        $facade->fillMessageInstanceWithExtractedData($message);
+
+        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/good_photo.html'));
+        $message->setId(3);
+        $facade->fillMessageInstanceWithExtractedData($message);
+
+
+        $info = $facade->retrieveWithName('test_test', false)->getChannelInfoDocument();
+        $list = $facade->getChannelMessagesRepository()->findBy(['channel' => $info]);
+        /** @var ChannelMessages[] $listIdKey */
+        $listIdKey = [];
+        /** @var ChannelMessages $row */
+        foreach ($list as $row) {
+            $listIdKey[$row->getIdWithinChannel()] = $row;
+        }
+
+        $listIdKey[1]->getVersions()->setChecked(2);
+        $listIdKey[2]->setVersions(new ChannelMessagesVersions());
+        $dm->flush();
+
+        $info = $facade->retrieveWithName('test_test', false)->getChannelInfoDocument();
+        $list = $facade->getChannelMessagesRepository()->findBy(['channel' => $info]);
+        /** @var ChannelMessages[] $listIdKey */
+        $listIdKey = [];
+        /** @var ChannelMessages $row */
+        foreach ($list as $row) {
+            $listIdKey[$row->getIdWithinChannel()] = $row;
+        }
+
+        $this->assertEquals(2, $listIdKey[1]->getVersions()->getChecked());
+        $this->assertEquals(null, $listIdKey[2]->getVersions()->getChecked());
+
+        $results = $facade->getChannelMessagesRepository()->getMessagesCheckVersionLessThen(2);
+        $this->assertCount(2, $results);
+
+        $results = $facade->getChannelMessagesRepository()->getMessagesCheckVersionLessThen(3);
+        $this->assertCount(3, $results);
     }
 
 }
