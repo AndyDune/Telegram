@@ -15,6 +15,8 @@ namespace AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule;
 
 class TmeLink extends AbstractRule
 {
+    protected $type = 'channels';
+
     protected $domains = ['t.me', 'telegram.me'];
 
     /**

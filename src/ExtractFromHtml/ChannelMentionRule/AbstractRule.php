@@ -15,10 +15,21 @@ namespace AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule;
 
 abstract class AbstractRule
 {
+    protected $type = '';
+
     abstract public function extract($text);
 
     public function __invoke($text)
     {
         return $this->extract($text);
     }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
 }

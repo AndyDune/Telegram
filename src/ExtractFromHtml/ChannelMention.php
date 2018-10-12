@@ -12,12 +12,16 @@
 namespace AndyDune\WebTelegram\ExtractFromHtml;
 
 
+use AndyDune\WebTelegram\Check\CommonNormalize;
+use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\AbstractRule;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\JoinLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\TmeLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\IsNotBot;
 
 class ChannelMention
 {
+    use CommonNormalize;
+
     protected $rules = [
         TmeLink::class,
         JoinLink::class
@@ -26,6 +30,9 @@ class ChannelMention
     protected $checks = [
         IsNotBot::class
     ];
+
+    protected $findChannels = [];
+    protected $findJoinLink = [];
 
     protected function getRules()
     {
@@ -40,6 +47,53 @@ class ChannelMention
 
     public function handle($text)
     {
+        $count = 0;
+        /** @var AbstractRule[] $rules */
+        $rules = $this->getRules();
+        foreach($rules as $rule) {
+            $links = $rule->extract($text);
+            if (!$links) {
+                continue;
+            }
+
+            switch ($rule->getType()) {
+                case 'channels':
+                    $count += $this->addChannels($links);
+                    break;
+                case 'join_links':
+                    $count += $this->addJoinLinks($links);
+                    break;
+
+            }
+        }
+        return $count;
+    }
+
+    protected function addChannels($links)
+    {
+        $count = 0;
+        foreach ($links as $link) {
+            $normal = $this->commonNormalize($link);
+            if (!array_key_exists($normal, $this->findChannels)) {
+                $count++;
+                $this->findChannels[$normal] = $link;
+            }
+        }
+        return $count;
+    }
+
+    protected function addJoinLinks($links)
+    {
+        $count = 0;
+        foreach ($links as $link) {
+            $normal = $this->commonNormalize($link);
+            if (!array_key_exists($normal, $this->findJoinLink)) {
+                $count++;
+                $this->findJoinLink[$normal] = $link;
+            }
+        }
+        return $count;
 
     }
+
 }

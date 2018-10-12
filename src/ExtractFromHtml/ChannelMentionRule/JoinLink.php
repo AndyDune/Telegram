@@ -11,13 +11,12 @@
 
 
 namespace AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule;
-
-
 use AndyDune\WebTelegram\Check\IsJoinLink;
 
-class JoinLink extends TmeLink
+class JoinLink extends AbstractRule
 {
     use IsJoinLink;
+    protected $type = 'join_links';
 
     /**
      *

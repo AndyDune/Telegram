@@ -11,6 +11,7 @@
 
 
 namespace AndyDuneTest\WebTelegram;
+use AndyDune\WebTelegram\Check\IsStickerLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\TmeLink;
 use PHPUnit\Framework\TestCase;
 
@@ -23,5 +24,26 @@ class ChannelMentionExtractTest extends TestCase
         $names = $tmeRule->extract(file_get_contents(__DIR__ . '/data/messages_content/have_link_1.phtml'));
         $this->assertCount(1, $names);
         $this->assertTrue(in_array('tv360ru', $names));
+    }
+
+    public function testIsStickerLink()
+    {
+        $instance = new class() {
+            use IsStickerLink;
+        };
+        $link = 'https://t.me/addstickers/WarcraftStickers';
+        $this->assertEquals('WarcraftStickers', $instance->isStickerLink($link));
+
+        $link = 'addstickers/WarcraftStickers';
+        $this->assertEquals('WarcraftStickers', $instance->isStickerLink($link));
+
+        $link = 'https://t.me/addstickers_/WarcraftStickers';
+        $this->assertFalse($instance->isStickerLink($link));
+
+        $link = 'https://t.me/addstickers_/WarcraftStickers/1';
+        $this->assertFalse($instance->isStickerLink($link));
+
+        $link = 'WarcraftStickers/1';
+        $this->assertFalse($instance->isStickerLink($link));
     }
 }
