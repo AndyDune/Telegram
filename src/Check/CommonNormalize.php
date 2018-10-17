@@ -11,12 +11,17 @@
 
 
 namespace AndyDune\WebTelegram\Check;
-
+use voku\helper\UTF8;
 
 trait CommonNormalize
 {
     public function commonNormalize($name)
     {
         return trim(strtolower($name));
+    }
+
+    public function commonNormalizeUtf($name)
+    {
+        return UTF8::strtolower(trim($name));
     }
 }
