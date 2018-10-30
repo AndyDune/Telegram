@@ -82,6 +82,12 @@ class ChannelMessages extends DocumentRepository
     }
 
 
+    /**
+     * @param int $version
+     * @param int $limit
+     * @param bool $noDeleted
+     * @return \AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessages[]
+     */
     public function getMessagesCheckVersionLessThen($version = 1, $limit = 10, $noDeleted = true)
     {
 /*
@@ -97,7 +103,7 @@ class ChannelMessages extends DocumentRepository
         if ($noDeleted) {
             $query['deleted'] = false;
         }
-        return $this->findBy($query, null, $limit);
+        return $this->findBy($query, ['date' => 1], $limit);
     }
 
 

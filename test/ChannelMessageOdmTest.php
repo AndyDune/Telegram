@@ -469,6 +469,7 @@ class ChannelMessageOdmTest extends TestCase
 
         $results = $facade->getChannelMessagesRepository()->getMessagesCheckVersionLessThen(3);
         $this->assertCount(3, $results);
+        $this->assertInstanceOf(ChannelMessages::class, array_shift($results));
     }
 
 }

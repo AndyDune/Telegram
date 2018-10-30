@@ -20,6 +20,7 @@ use phpDocumentor\Reflection\Types\This;
 
 /** @ODM\Document(collection="channel_messages", repositoryClass="AndyDune\WebTelegram\DoctrineOdm\Repository\ChannelMessages")
     @Indexes({
+        @Index(keys={"versions.checked"="asc", "date"="asc"}),
         @Index(keys={"channel"="asc", "date"="desc"}),
         @Index(keys={"channel"="asc", "deleted"="asc", "date"="desc"}),
         @Index(keys={"channel"="asc", "date"="asc"}),
