@@ -11,6 +11,7 @@
 
 
 namespace AndyDune\WebTelegram\DoctrineOdm\Documents;
+use AndyDune\WebTelegram\Strategy\ChannelMessageActionInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Indexes;
 use Doctrine\ODM\MongoDB\Mapping\Annotations\Index;
@@ -456,6 +457,18 @@ class ChannelMessages
     {
         $this->views = $views;
         return $this;
+    }
+
+    /**
+     * Execute any action with channel model.
+     * No need to extend this class.
+     *
+     * @param ChannelMessageActionInterface $action
+     * @return mixed
+     */
+    public function executeAction(ChannelMessageActionInterface $action)
+    {
+        return $action->executeAction($this);
     }
 
     public function populateForNew()

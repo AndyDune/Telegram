@@ -19,6 +19,7 @@ use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelsInfoForMessages;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMessage;
 use AndyDune\WebTelegram\Registry;
 use AndyDune\WebTelegram\Request\RequestChannelMessage;
+use AndyDuneTest\WebTelegram\Mock\ChannelActionIncrement;
 use Doctrine\ODM\MongoDB\Cursor;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPUnit\Framework\TestCase;
@@ -145,6 +146,43 @@ class ChannelMessageOdmTest extends TestCase
         $this->assertEquals(1, $versions->getFindChannel());
         $this->assertEquals(3, $versions->getFindSticker());
         $this->assertEquals(5, $versions->getUpdated());
+    }
+
+    /**
+     * @covers \AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessages::executeAction
+     */
+    public function testChannelInfoAction()
+    {
+        $registry = Registry::getInstance();
+        /** @var DocumentManager $dm */
+        $dm = $registry->getServiceManager()->get('document_manager');
+
+        $dm->getSchemaManager()->ensureIndexes();
+
+        $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
+        $base->remove(['name' => ['$in' => ['test_dune_english', 'test_rzn1rzn']]]);
+
+        $baseMessages = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_messages');
+        $baseMessages->remove(['channelName' => ['$in' => ['test_dune_english', 'test_rzn1rzn']]]);
+
+        /** @var ChannelsInfoForMessages $infoChannel */
+        $infoChannel = $registry->getServiceManager()->get(ChannelsInfoForMessages::class);
+        $infoChannel->populateForNew();
+        $infoChannel->setName('test_dune_ENGLISH');
+        //$dm->flush();
+
+
+        /** @var ChannelMessages $message */
+        $message = $registry->getServiceManager()->get(ChannelMessages::class);
+        $message->setChannel($infoChannel);
+        $message->setIdWithinChannel(12)
+            ->setViews(10)
+            ->setWidgetMessageVoice('ссылка на файл 12')
+            ->setText('Привет все');
+
+        $message->executeAction(new ChannelActionIncrement());
+        $this->assertEquals(11, $message->getViews());
+
     }
 
     public function testChannelInfoFacade()
