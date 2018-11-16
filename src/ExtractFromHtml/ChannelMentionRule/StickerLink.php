@@ -4,7 +4,7 @@
  * | Author: Andrey Ryzhov (Dune) <info@rznw.ru> |
  * | Site: www.rznw.ru                           |
  * | Phone: +7 (4912) 51-10-23                   |
- * | Date: 04.10.2018                            |
+ * | Date: 16.11.2018                            |
  * -----------------------------------------------
  *
  */
@@ -13,9 +13,12 @@
 namespace AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule;
 
 
-class TmeLink extends AbstractRule
+use AndyDune\WebTelegram\Check\IsStickerLink;
+
+class StickerLink extends AbstractRule
 {
-    protected $type = 'channels';
+    use IsStickerLink;
+    protected $type = 'stickers';
 
     protected $domains = ['t.me', 'telegram.me'];
 
@@ -30,29 +33,17 @@ class TmeLink extends AbstractRule
     {
         $result = [];
         $matches = [];
-        $links = preg_match_all('|href="([^"]+)"|ui', $text, $matches);
+        $links = preg_match_all('|(t.me/[-_a-z0-9/]+)|ui', $text, $matches);
         if (!$links or !array_key_exists(1, $matches)) {
             return false;
         }
         foreach ($matches[1] as $uri) {
-            $parts = parse_url($uri);
-            if (!array_key_exists('host', $parts)) {
-                continue;
-            }
-            if (!in_array($parts['host'], $this->domains)) {
-                continue;
-            }
-            if (!array_key_exists('path', $parts)) {
-                continue;
+            $path = $this->isStickerLink($uri);
+            if ($path) {
+                $result[] = $path;
             }
 
-            $path = trim($parts['path'], '/ ');
-            if (strpos($path, '/')) {
-                continue;
-            }
-            $result[] = $path;
         }
-
         return $result;
     }
 }

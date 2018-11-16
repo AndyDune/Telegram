@@ -11,6 +11,7 @@
 
 
 namespace AndyDuneTest\WebTelegram;
+use AndyDune\WebTelegram\ExtractFromHtml\ChannelMention;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\IsNotBot;
 use PHPUnit\Framework\TestCase;
 
@@ -25,4 +26,42 @@ class ChannelMentionTest extends TestCase
         $this->assertTrue($check('onetwobot_not'));
         $this->assertFalse($check('onetwo_bot'));
     }
+
+
+    public function testInComplex()
+    {
+        $extractor = new ChannelMention();
+        $text = 'https://t.me/addstickers/WarcraftStickers';
+        $this->assertEquals(1, $extractor->handle($text));
+        $this->assertEquals('WarcraftStickers', $extractor->getFindStickers()['warcraftstickers']);
+
+        $extractor = new ChannelMention();
+        $text = '
+        https://t.me/addstickers/WarcraftStickers
+        https://t.me/addstickers/Warcraft_Stickers
+        ';
+        $this->assertEquals(2, $extractor->handle($text));
+        $this->assertEquals('WarcraftStickers', $extractor->getFindStickers()['warcraftstickers']);
+        $this->assertEquals('Warcraft_Stickers', $extractor->getFindStickers()['warcraft_stickers']);
+
+        $extractor = new ChannelMention();
+        $text = '
+        https://t.me/addstickers/WarcraftStickers
+        
+        <a href="https://t.me/karaulny" target="_blank">@karaulny</a> Караульный 83000 <br/>
+        adsadsadsad
+        adasdasdsad
+        addasd
+        
+        <a href="https://t.me/joinchat/SasaS_adjkasndsahh" target="_blank">@karaulny</a> Караульный 83000 <br/>
+        
+        https://t.me/addstickers/Warcraft_Stickers
+        ';
+        $this->assertEquals(4, $extractor->handle($text));
+        $this->assertEquals('WarcraftStickers', $extractor->getFindStickers()['warcraftstickers']);
+        $this->assertEquals('Warcraft_Stickers', $extractor->getFindStickers()['warcraft_stickers']);
+        $this->assertEquals('karaulny', $extractor->getFindChannels()['karaulny']);
+        $this->assertEquals('joinchat/SasaS_adjkasndsahh', $extractor->getFindJoinLink()['joinchat/sasas_adjkasndsahh']);
+    }
+
 }

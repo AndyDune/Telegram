@@ -15,6 +15,7 @@ namespace AndyDune\WebTelegram\ExtractFromHtml;
 use AndyDune\WebTelegram\Check\CommonNormalize;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\AbstractRule;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\JoinLink;
+use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\StickerLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\TmeLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\IsNotBot;
 
@@ -24,7 +25,8 @@ class ChannelMention
 
     protected $rules = [
         TmeLink::class,
-        JoinLink::class
+        JoinLink::class,
+        StickerLink::class,
     ];
 
     protected $checks = [
@@ -33,6 +35,7 @@ class ChannelMention
 
     protected $findChannels = [];
     protected $findJoinLink = [];
+    protected $findStickers = [];
 
     protected function getRules()
     {
@@ -63,11 +66,53 @@ class ChannelMention
                 case 'join_links':
                     $count += $this->addJoinLinks($links);
                     break;
+                case 'stickers':
+                    $count += $this->addStickers($links);
+                    break;
 
             }
         }
         return $count;
     }
+
+    /**
+     * @return array
+     */
+    public function getFindChannels(): array
+    {
+        return $this->findChannels;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFindJoinLink(): array
+    {
+        return $this->findJoinLink;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFindStickers(): array
+    {
+        return $this->findStickers;
+    }
+
+
+    protected function addStickers($links)
+    {
+        $count = 0;
+        foreach ($links as $link) {
+            $normal = $this->commonNormalize($link);
+            if (!array_key_exists($normal, $this->findStickers)) {
+                $count++;
+                $this->findStickers[$normal] = $link;
+            }
+        }
+        return $count;
+    }
+
 
     protected function addChannels($links)
     {
