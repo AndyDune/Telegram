@@ -49,9 +49,11 @@ class ChannelMentionTest extends TestCase
         https://t.me/addstickers/WarcraftStickers
         
         <a href="https://t.me/karaulny" target="_blank">@karaulny</a> Караульный 83000 <br/>
+        <a href="https://t.me/karaulny" target="_blank">@karaulny</a> Караульный 83000 <br/>
         adsadsadsad
         adasdasdsad
         addasd
+        <a href="https://t.me/karaulnybot" target="_blank">@bot</a> Бот <br/>
         
         <a href="https://t.me/joinchat/SasaS_adjkasndsahh" target="_blank">@karaulny</a> Караульный 83000 <br/>
         

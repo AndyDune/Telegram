@@ -17,6 +17,7 @@ use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\AbstractRule;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\JoinLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\StickerLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\TmeLink;
+use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\AbstractChannelNameCheck;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\IsNotBot;
 
 class ChannelMention
@@ -29,7 +30,7 @@ class ChannelMention
         StickerLink::class,
     ];
 
-    protected $checks = [
+    protected $checkChannel = [
         IsNotBot::class
     ];
 
@@ -46,6 +47,20 @@ class ChannelMention
             }
         }
         return $this->rules;
+    }
+
+    /**
+     * @return AbstractChannelNameCheck[]
+     */
+    protected function getChannelChecks()
+    {
+        foreach($this->checkChannel as $key =>  $rule) {
+            if (is_string($rule)) {
+                $rule = new $rule;
+                $this->checkChannel[$key] = $rule;
+            }
+        }
+        return $this->checkChannel;
     }
 
     public function handle($text)
@@ -120,11 +135,25 @@ class ChannelMention
         foreach ($links as $link) {
             $normal = $this->commonNormalize($link);
             if (!array_key_exists($normal, $this->findChannels)) {
-                $count++;
-                $this->findChannels[$normal] = $link;
+                if ($this->checkChannelName($link)) {
+                    $count++;
+                    $this->findChannels[$normal] = $link;
+                }
             }
         }
         return $count;
+    }
+
+    protected function checkChannelName($name)
+    {
+        $checks = $this->getChannelChecks();
+        foreach($checks as $rule) {
+            if ($rule->check($name)) {
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
 
     protected function addJoinLinks($links)
