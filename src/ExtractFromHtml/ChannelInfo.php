@@ -19,6 +19,8 @@ class ChannelInfo
 
     protected $participantsCount = null;
 
+    protected $type = null;
+
     protected $messageDate = null;
     protected $messageViews = null;
     protected $messagePhotoLink = null;
@@ -31,10 +33,12 @@ class ChannelInfo
     const ERROR_BAD_DATA_FORMAT = 100;
     const ERROR_EXCEPTION = 200;
     const ERROR_NO_PARTICIPANTS_COUNT = 101;
-
-
-    const ERROR_POST_NOT_FOUND = 404;
     const ERROR_UNKNOWN = 399;
+
+    const TYPE_CHANNEL = 'channel';
+    const TYPE_GROUP = 'group';
+    const TYPE_PERSON = 'person';
+    const TYPE_ = 'person';
 
     protected $tagPathForParticipantsCount = 'div.tgme_page_wrap div.tgme_page_extra';
 
@@ -56,16 +60,17 @@ class ChannelInfo
 
             $doc = new Document($html);
 
+
+
             $res = Document\Query::execute($this->tagPathForParticipantsCount, $doc, Document\Query::TYPE_CSS);
             if ($res->count()) {
                 /** @var \DOMNodeList $content */
                 $content = current($res);
                 $string = $content->item(0)->nodeValue;
                 $this->participantsCount = (int)preg_replace('|[^0-9]|iu', '', $string);
-            } else {
-                $this->errorCode = self::ERROR_NO_PARTICIPANTS_COUNT;
-                return false;
             }
+
+
 
         } catch (\Exception $e) {
             $this->errorCode = self::ERROR_EXCEPTION;
@@ -73,6 +78,12 @@ class ChannelInfo
             return false;
         }
         return true;
+    }
+
+
+    protected function extractType(Document $doc)
+    {
+
     }
 
     /**

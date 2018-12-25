@@ -15,6 +15,26 @@ use AndyDune\WebTelegram\ExtractFromHtml\ChannelInfo;
 use PHPUnit\Framework\TestCase;
 
 
+/**
+ * Groups:
+ * https://t.me/ColoradoFurries
+ * https://t.me/Beansoup
+ *
+ * Persons:
+ *
+ *
+ * Private (porno):
+ * https://t.me/sunnyfans
+ * https://t.me/bigtitsss
+ * https://t.me/sweetmilfs
+ * https://t.me/nudessafadex
+ *
+ * NotExists:
+ * https://t.me/ColoradoFurries1
+ *
+ * Class ChannelInfoExtractFromHtmlTest
+ * @package AndyDuneTest\WebTelegram
+ */
 class ChannelInfoExtractFromHtmlTest extends TestCase
 {
     public function testSuccessExtract()

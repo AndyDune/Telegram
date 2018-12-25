@@ -36,6 +36,9 @@ class TmeLink extends AbstractRule
         }
         foreach ($matches[1] as $uri) {
             $parts = parse_url($uri);
+            if (!$parts or !is_array($parts)) {
+                continue;
+            }
             if (!array_key_exists('host', $parts)) {
                 continue;
             }
