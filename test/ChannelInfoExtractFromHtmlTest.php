@@ -11,14 +11,19 @@
 
 
 namespace AndyDuneTest\WebTelegram;
+
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelInfo;
 use PHPUnit\Framework\TestCase;
 
 
 /**
+ * Public channels:
+ * https://t.me/andydune_programming
+ *
  * Groups:
  * https://t.me/ColoradoFurries
  * https://t.me/Beansoup
+ * https://t.me/the_englishclub
  *
  * Persons:
  *
@@ -41,5 +46,53 @@ class ChannelInfoExtractFromHtmlTest extends TestCase
     {
         $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/normal.html'));
         $this->assertTrue($info->isSuccess());
+
     }
+
+    public function testTypeExtract()
+    {
+        $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/normal.html'));
+        $this->assertTrue($info->isSuccess());
+
+        $this->assertEquals(ChannelInfo::TYPE_CHANNEL, $info->getType());
+
+        $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/chat_1.html'));
+        $this->assertTrue($info->isSuccess());
+
+        $this->assertEquals(ChannelInfo::TYPE_GROUP, $info->getType());
+
+
+        $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/no_data.html'));
+        $this->assertTrue($info->isSuccess());
+
+        $this->assertEquals(null, $info->getType());
+
+        $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/person_1.html'));
+        $this->assertTrue($info->isSuccess());
+
+        $this->assertEquals(null, $info->getType());
+
+
+        $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/private_1.html'));
+        $this->assertTrue($info->isSuccess());
+
+        $this->assertEquals(null, $info->getType());
+
+    }
+
+    public function testTypeExtractRequest()
+    {
+        $info = new ChannelInfo(file_get_contents('https://t.me/andydune_programming'));
+        $this->assertTrue($info->isSuccess());
+
+        $this->assertEquals(ChannelInfo::TYPE_CHANNEL, $info->getType());
+
+        $info = new ChannelInfo(file_get_contents('https://t.me/the_englishclub'));
+        $this->assertTrue($info->isSuccess());
+
+        $this->assertEquals(ChannelInfo::TYPE_GROUP, $info->getType());
+
+    }
+
+
 }

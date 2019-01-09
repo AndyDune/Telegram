@@ -42,6 +42,8 @@ class ChannelInfo
 
     protected $tagPathForParticipantsCount = 'div.tgme_page_wrap div.tgme_page_extra';
 
+    protected $tagPathForViewChannel = 'div.tgme_page_action a.tgme_action_button_new';
+
     public function __construct($html)
     {
         $this->html = $html;
@@ -61,16 +63,17 @@ class ChannelInfo
             $doc = new Document($html);
 
 
-
             $res = Document\Query::execute($this->tagPathForParticipantsCount, $doc, Document\Query::TYPE_CSS);
             if ($res->count()) {
                 /** @var \DOMNodeList $content */
                 $content = current($res);
                 $string = $content->item(0)->nodeValue;
+                $parts = explode(',', $string); // 7 members, 2 online
+                $string = $parts[0];
                 $this->participantsCount = (int)preg_replace('|[^0-9]|iu', '', $string);
             }
 
-
+            $this->extractType($doc);
 
         } catch (\Exception $e) {
             $this->errorCode = self::ERROR_EXCEPTION;
@@ -83,6 +86,20 @@ class ChannelInfo
 
     protected function extractType(Document $doc)
     {
+        // channel is accessed in public
+        $res = Document\Query::execute($this->tagPathForViewChannel, $doc, Document\Query::TYPE_CSS);
+        if ($res->count()) {
+            /** @var \DOMNodeList $content */
+            $content = current($res);
+            $string = $content->item(0)->nodeValue;
+            if (preg_match('|View Channel|ui', $string)) {
+                $this->type = self::TYPE_CHANNEL;
+            }
+
+            if (preg_match('|View Group|ui', $string)) {
+                $this->type = self::TYPE_GROUP;
+            }
+        }
 
     }
 
@@ -131,5 +148,15 @@ class ChannelInfo
     {
         return $this->errorMassage;
     }
+
+    /**
+     * @return null|string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+
 
 }
