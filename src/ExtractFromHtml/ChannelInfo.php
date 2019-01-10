@@ -44,6 +44,8 @@ class ChannelInfo
 
     protected $tagPathForViewChannel = 'div.tgme_page_action a.tgme_action_button_new';
 
+    protected $tagHeadTitle = 'head meta[property=og:title]';
+
     public function __construct($html)
     {
         $this->html = $html;
@@ -73,7 +75,7 @@ class ChannelInfo
                 $this->participantsCount = (int)preg_replace('|[^0-9]|iu', '', $string);
             }
 
-            $this->extractType($doc);
+            $this->extractType($doc, $html);
 
         } catch (\Exception $e) {
             $this->errorCode = self::ERROR_EXCEPTION;
@@ -84,7 +86,7 @@ class ChannelInfo
     }
 
 
-    protected function extractType(Document $doc)
+    protected function extractType(Document $doc, $html)
     {
         // channel is accessed in public
         $res = Document\Query::execute($this->tagPathForViewChannel, $doc, Document\Query::TYPE_CSS);
@@ -99,6 +101,23 @@ class ChannelInfo
             if (preg_match('|View Group|ui', $string)) {
                 $this->type = self::TYPE_GROUP;
             }
+
+            if (preg_match('|Send Message|ui', $string)) {
+
+                $arr = [];
+
+                $result1 = preg_match('|<meta property="og:title" content="([^"]+)"|ui', $html, $arr);
+
+                $result2 = preg_match('|<meta property="og:image" content="https://telegram.org/img/t_logo.png">|ui',
+                    $html);
+
+                if (!$result2 and $result1 == 1 and !preg_match('|^Telegram: Contact @|ui', $arr[1])) {
+                    $this->type = self::TYPE_PERSON;
+                }
+
+            }
+
+
         }
 
     }

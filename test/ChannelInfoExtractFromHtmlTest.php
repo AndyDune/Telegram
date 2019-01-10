@@ -69,8 +69,12 @@ class ChannelInfoExtractFromHtmlTest extends TestCase
 
         $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/person_1.html'));
         $this->assertTrue($info->isSuccess());
+        $this->assertEquals(ChannelInfo::TYPE_PERSON, $info->getType());
 
+        $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/person_wrong_1.html'));
+        $this->assertTrue($info->isSuccess());
         $this->assertEquals(null, $info->getType());
+
 
 
         $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/private_1.html'));
