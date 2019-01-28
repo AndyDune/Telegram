@@ -18,6 +18,7 @@ use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\JoinLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\StickerLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMentionRule\TmeLink;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\AbstractChannelNameCheck;
+use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\ChannelAllowSymbolsInName;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\IsNotBot;
 
 class ChannelMention
@@ -31,7 +32,8 @@ class ChannelMention
     ];
 
     protected $checkChannel = [
-        IsNotBot::class
+        IsNotBot::class,
+        ChannelAllowSymbolsInName::class
     ];
 
     protected $findChannels = [];

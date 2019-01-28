@@ -71,7 +71,7 @@ class ChannelMassageTest extends TestCase
         $this->assertEquals('https://cdn5.telesco.pe/file/nNTrF9bYwr8i1uSs3ZCyoTzmIAxVQ8rVuouLkW-d4FHcU7zf4WMrJJwjuQFDjLjmeFWh93t85mvVL-uX7K9PiREZEFwAbEf-5lJ5zwssYLvRE7lSgf_Hy-3rSYD8xdp-Lj9IdXE5uN788_uh_3YG8WTJQRewL2hqY3VjgYr7qw1rAdb6LrTOt-iCQu0CJg9HrJh69aI6eYo8JdS0txgVXxJfYJEuu5NId5RsVF5PgLAIEoWoL94aZX5BrYZUt7LqJKeBPhY6CrBkkdl_X0w9DAaTvTA4cPJWjUkOsW7c0-6J8fmTs-kpRavRaPOdU9L-ZrT-hH16-jQFj0UQFquOmg.ogg', $message->getMessageVoice());
 
         // Ссылка меняется - можно не указывать ее полностью - достаточно флага чт есть звук
-        $message = new ChannelMessage(file_get_contents('https://t.me/shomalmuzic/5636?embed=1'));
+        $message = new ChannelMessage(file_get_contents('https://t.me/andydune_programming/51?embed=1'));
         $this->assertTrue($message->isSuccess());
         $this->assertTrue(strlen($message->getMessageVoice()) > 20);
         $this->assertNotEquals('https://cdn5.telesco.pe/file/nNTrF9bYwr8i1uSs3ZCyoTzmIAxVQ8rVuouLkW-d4FHcU7zf4WMrJJwjuQFDjLjmeFWh93t85mvVL-uX7K9PiREZEFwAbEf-5lJ5zwssYLvRE7lSgf_Hy-3rSYD8xdp-Lj9IdXE5uN788_uh_3YG8WTJQRewL2hqY3VjgYr7qw1rAdb6LrTOt-iCQu0CJg9HrJh69aI6eYo8JdS0txgVXxJfYJEuu5NId5RsVF5PgLAIEoWoL94aZX5BrYZUt7LqJKeBPhY6CrBkkdl_X0w9DAaTvTA4cPJWjUkOsW7c0-6J8fmTs-kpRavRaPOdU9L-ZrT-hH16-jQFj0UQFquOmg.ogg', $message->getMessageVoice());

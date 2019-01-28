@@ -12,6 +12,7 @@
 
 namespace AndyDuneTest\WebTelegram;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMention;
+use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\ChannelAllowSymbolsInName;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelNameCheckRule\IsNotBot;
 use PHPUnit\Framework\TestCase;
 
@@ -25,6 +26,20 @@ class ChannelMentionTest extends TestCase
         $this->assertFalse($check->check('onetwobot'));
         $this->assertTrue($check('onetwobot_not'));
         $this->assertFalse($check('onetwo_bot'));
+    }
+
+    /**
+     * @covers ChannelAllowSymbolsInName::check
+     */
+    public function testChannelNameAllow()
+    {
+        $check = new ChannelAllowSymbolsInName();
+        $this->assertTrue($check->check('onetwobotnot'));
+        $this->assertTrue($check('onetwobot_not'));
+        $this->assertTrue($check('andydune_english'));
+        $this->assertFalse($check('onetwobot.not'));
+        $this->assertFalse($check('привет'));
+        $this->assertFalse($check('beauty\\_shopper.%0AКатя%20почти%20каждый%20день%20пишет%20где%20и%20на%20какие%20марки%20косметоса%20есть%20сейлы%20(от%20дорогих,%20до%20масс-маркета'));
     }
 
 
@@ -51,6 +66,7 @@ class ChannelMentionTest extends TestCase
         <a href="https://t.me/karaulny" target="_blank">@karaulny</a> Караульный 83000 <br/>
         <a href="https://t.me/karaulny" target="_blank">@karaulny</a> Караульный 83000 <br/>
         adsadsadsad
+        <a href="https://t.me/beauty\\_shopper.%0AКатя%20почти%20каждый%20день%20пишет%20где%20и%20на%20какие%20марки%20косметоса%20есть%20сейлы%20(от%20дорогих,%20до%20масс-маркета" target="_blank">@some</a> Wrong <br/>
         adasdasdsad
         addasd
         <a href="https://t.me/karaulnybot" target="_blank">@bot</a> Бот <br/>
