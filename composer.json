@@ -28,7 +28,7 @@
         "zendframework/zend-dom": "2.*",
         "andydune/pipeline": "*",
         "andydune/custom-string-explode": "1.*",
-        "alcaeus/mongo-php-adapter": "^1.1",
+        "alcaeus/mongo-php-adapter": "^1",
         "doctrine/mongodb-odm": "^1.2"
     },
     "require-dev": {
