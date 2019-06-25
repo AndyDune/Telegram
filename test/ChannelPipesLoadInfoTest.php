@@ -125,7 +125,7 @@ class ChannelPipesLoadInfoTest extends TestCase
         $this->assertEquals(10, $result->getChannelLinkCount());
     }
 
-    public function _testPipeExtractChannelMessages()
+    public function testPipeExtractChannelMessages()
     {
         $data = new Data();
         $data->setHtmlBody(file_get_contents(__DIR__ . '/data/channel_info_s/dune_english.html'));

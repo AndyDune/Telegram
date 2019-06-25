@@ -12,11 +12,14 @@
 
 namespace AndyDune\WebTelegram\ChannelPipes\LoadInfo;
 
+use AndyDune\WebTelegram\ExtractFromHtml\Part\DomElementToDocument;
+use AndyDune\WebTelegram\ExtractFromHtml\Part\ExtractWithDomTrait;
 use Zend\Dom\Document;
 use Zend\Dom\Document\Query;
 
 class PipeExtractChannelMessages
 {
+    use DomElementToDocument, ExtractWithDomTrait;
     /**
      * @var Document
      */
@@ -37,7 +40,7 @@ class PipeExtractChannelMessages
 
         foreach ($res as $row) {
             $message = $this->extractMessageData($row);
-            if (!$message) {
+            if ($message) {
                 $data->addMessage($message);
             }
         }
@@ -48,6 +51,21 @@ class PipeExtractChannelMessages
 
     public function extractMessageData(\DOMElement $row): ?DataChannelMessage
     {
+        $this->doc = $this->domElementToDocument($row);
+
+        $id = $this->extractId();
+        if (!$id) {
+            return null;
+        }
+
+        $message = new DataChannelMessage($id);
+
+        $text = $this->extractMessageText();
+        $message->setText($text);
+
+
+        return $message;
+
         foreach ($row->childNodes as $child) {
             if (!($child instanceof \DOMElement)) {
                 continue;
@@ -57,14 +75,36 @@ class PipeExtractChannelMessages
                 continue;
             }
             $class = $class->nodeValue;
-            if (strpos('tgme_widget_message_text', $class) !== false) {
+            if (strpos($class, 'tgme_widget_message_text') !== false) {
                 // extract message
             }
 
-            if (strpos('tgme_widget_message_footer', $class) !== false) {
-                // extract id
+            if (strpos($class, 'tgme_widget_message_footer') !== false) {
+                $this->doc = $this->domElementToDocument($child);
+                $id = $this->extractId();
+
             }
         }
+        return null;
+    }
+
+
+    protected function extractMessageText()
+    {
+        return $this->extractContentAsString('.tgme_widget_message_text', false);
+    }
+
+    protected function extractId()
+    {
+        $link = $this->extractAttribute('.tgme_widget_message_info .tgme_widget_message_date', 'href');
+        if (!$link) {
+            return null;
+        }
+        $parts = explode('/', trim($link, ' /'));
+        if (count($parts) < 2) {
+            return null;
+        }
+        return (int)array_pop($parts);
     }
 
 }
