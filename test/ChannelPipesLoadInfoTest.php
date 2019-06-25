@@ -15,6 +15,7 @@ namespace AndyDuneTest\WebTelegram;
 
 use AndyDune\Pipeline\Pipeline;
 use AndyDune\WebTelegram\ChannelPipes\LoadInfo\Data;
+use AndyDune\WebTelegram\ChannelPipes\LoadInfo\DataChannelMessage;
 use AndyDune\WebTelegram\ChannelPipes\LoadInfo\PipeCheckDataBeforeParse;
 use AndyDune\WebTelegram\ChannelPipes\LoadInfo\PipeExtractChannelInfo;
 use AndyDune\WebTelegram\ChannelPipes\LoadInfo\PipeExtractChannelMessages;
@@ -134,5 +135,6 @@ class ChannelPipesLoadInfoTest extends TestCase
         $pipeLine->pipe(PipeExtractChannelMessages::class);
         /** @var Data $result */
         $result = $pipeLine->execute();
+        $this->assertInstanceOf(DataChannelMessage::class, current($result->getMessages()));
     }
 }

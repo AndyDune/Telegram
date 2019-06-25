@@ -13,7 +13,7 @@
 namespace AndyDune\WebTelegram\ExtractFromHtml\Part;
 
 
-use DOMAttr;
+use DOMAttr, DOMElement;
 use Zend\Dom\Document;
 use Zend\Dom\Document\Query;
 
@@ -43,8 +43,36 @@ trait ExtractWithDomTrait
             }
         }
         return false;
+    }
+
+    protected function extractContentAsHtml($path)
+    {
+        if (!is_array($path)) {
+            $path = [$path];
+        }
+
+        foreach ($path as $pathRow) {
+            $res = Query::execute($pathRow, $this->doc, Document\Query::TYPE_CSS);
+            if ($res->count()) {
+                $string = '';
+                /** @var \DOMNodeList $content */
+                $content = current($res);
+                $item = $content->item(0);
+                if (!($item instanceof DOMElement)) {
+                    continue;
+                }
+                foreach ($item->childNodes as $child) {
+                    $string .= $item->ownerDocument->saveXML( $child );
+                }
+
+                //$string = $this->doc->getDomDocument()->saveXML($content->item(0));
+                return $string;
+            }
+        }
+        return false;
 
     }
+
 
     protected function extractAttribute($path, $attribute)
     {

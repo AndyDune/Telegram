@@ -48,7 +48,7 @@ class ChannelMessage
     protected $tagPathForMessageVoice = 'audio.tgme_widget_message_voice';
 
     // https://t.me/nim_ru/2021?embed=1
-    protected $tagPathForSticker = 'a.message_media_view_in_telegram';
+    protected $tagPathForSticker = '.tgme_widget_message_sticker_wrap a';
 
     public function __construct($html)
     {

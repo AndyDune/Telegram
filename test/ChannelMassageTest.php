@@ -78,7 +78,7 @@ class ChannelMassageTest extends TestCase
 
 
         // https://t.me/nim_ru/2021?embed=1
-        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/message_with_sticker.html'));
+        $message = new ChannelMessage(file_get_contents(__DIR__ . '/data/message/message_with_sticker.html')); // it is old
         $this->assertTrue($message->isSuccess());
         $this->assertEquals('2018-10-08T12:03:26+00:00', $message->getMessageDate());
         $this->assertEquals('https://t.me/addstickers/WarcraftStickers', $message->getMessageSticker());
@@ -86,7 +86,7 @@ class ChannelMassageTest extends TestCase
         $message = new ChannelMessage(file_get_contents('https://t.me/nim_ru/2021?embed=1'));
         $this->assertTrue($message->isSuccess());
         $this->assertEquals('2018-10-08T12:03:26+00:00', $message->getMessageDate());
-        $this->assertEquals('https://t.me/addstickers/WarcraftStickers', $message->getMessageSticker());
+        $this->assertEquals('https://t.me/nim_ru/2021', $message->getMessageSticker());
 
 
     }

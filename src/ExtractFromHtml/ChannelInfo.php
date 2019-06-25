@@ -11,10 +11,13 @@
 
 
 namespace AndyDune\WebTelegram\ExtractFromHtml;
+use AndyDune\WebTelegram\ExtractFromHtml\Part\ExtractWithDomTrait;
 use Zend\Dom\Document;
 
 class ChannelInfo
 {
+    use ExtractWithDomTrait;
+
     protected $html;
 
     protected $participantsCount = null;
@@ -63,6 +66,7 @@ class ChannelInfo
             }
 
             $doc = new Document($html);
+            $this->doc = $doc;
 
 
             $res = Document\Query::execute($this->tagPathForParticipantsCount, $doc, Document\Query::TYPE_CSS);
@@ -88,7 +92,27 @@ class ChannelInfo
 
     protected function extractType(Document $doc, $html)
     {
-        // channel is accessed in public
+        $path = $this->extractAttribute('.tgme_page_context_btn .tgme_action_button_new', 'href');
+        $string = $this->extractContentAsString('.tgme_page_context_btn .tgme_action_button_label');
+        if ($path and strpos($path, '/s/') === 0 and preg_match('|Preview channel|ui', $string)) {
+            $this->type = self::TYPE_CHANNEL;
+            return;
+        }
+
+        $string = $this->extractContentAsString($this->tagPathForViewChannel);
+        if (preg_match('|View Channel|ui', $string)) {
+            $this->type = self::TYPE_CHANNEL;
+            return;
+        }
+
+        $string = $this->extractContentAsString('.tgme_page_post .tgme_page_title');
+        $stringExtra = $this->extractContentAsString('.tgme_page_post .tgme_page_extra');
+        if ($string and $stringExtra and preg_match('|[\d]+ members|ui', $stringExtra)) {
+            $this->type = self::TYPE_GROUP;
+            return;
+        }
+
+            // channel is accessed in public
         $res = Document\Query::execute($this->tagPathForViewChannel, $doc, Document\Query::TYPE_CSS);
         if ($res->count()) {
             /** @var \DOMNodeList $content */

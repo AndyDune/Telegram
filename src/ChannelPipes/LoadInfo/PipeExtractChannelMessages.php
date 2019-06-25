@@ -91,7 +91,7 @@ class PipeExtractChannelMessages
 
     protected function extractMessageText()
     {
-        return $this->extractContentAsString('.tgme_widget_message_text', false);
+        return $this->extractContentAsHtml('.tgme_widget_message_text');
     }
 
     protected function extractId()
