@@ -17,8 +17,14 @@ use GuzzleHttp\Client;
 class PipeLoadHtml
 {
 
-    public function __invoke(Data $data, callable $next, $type = null, $typePriority = null, $allowDelete = true)
+    public function __invoke(Data $data, callable $next)
     {
+        if (!$data->getChannelName()) {
+            $data->setErrorMessage('No channel name was set.');
+            $data->setErrorPlace(PipeLoadHtml::class);
+            return $data;
+        }
+
         try {
             $client = new Client([
                 'headers' => [
@@ -42,13 +48,6 @@ class PipeLoadHtml
         $body = $res->getBody();
         $html = $body->getContents();
         $data->setHtmlBody($html);
-
-        if ($code != 200) {
-            $data->setErrorMessage('Status is not 200');
-            $data->setErrorCode(0);
-            $data->setErrorPlace('html_status_code_not_200');
-            return $data;
-        }
 
         return $next($data);
     }

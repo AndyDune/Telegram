@@ -18,6 +18,11 @@ class Data
 {
     use NormalizeName;
 
+    const ERROR_CODE_302 = '302';
+    const ERROR_NO_200 = 'no_200';
+    const ERROR_NO_DOCTYPE = 'no_doctype';
+    const ERROR_NO_CHANNEL_TITLE = 'no_channel_title';
+
     protected $channelName = null;
     protected $channelNormalName = null;
 
@@ -28,6 +33,20 @@ class Data
     protected $errorMessage = '';
     protected $errorCode = null;
     protected $errorPlace = null;
+
+    protected $channelTitle = null;
+    protected $channelDescription = null;
+    protected $channelImageUrl = null;
+    protected $channelMemberCount = null;
+    protected $channelPhotoCount = null;
+    protected $channelLinkCount = null;
+
+    protected $channelCountData = 0;
+
+    /**
+     * @var DataChannelMessage[]
+     */
+    protected $messages = [];
 
     /**
      * @return null
@@ -142,7 +161,149 @@ class Data
         $this->errorPlace = $errorPlace;
     }
 
+    /**
+     * @return null
+     */
+    public function getChannelNormalName()
+    {
+        return $this->channelNormalName;
+    }
 
+    /**
+     * @param null $channelNormalName
+     */
+    public function setChannelNormalName($channelNormalName): void
+    {
+        $this->channelNormalName = $channelNormalName;
+    }
+
+    /**
+     * @return null
+     */
+    public function getChannelTitle()
+    {
+        return $this->channelTitle;
+    }
+
+    /**
+     * @param null $channelTitle
+     */
+    public function setChannelTitle($channelTitle): void
+    {
+        $this->channelTitle = $channelTitle;
+    }
+
+    /**
+     * @return null
+     */
+    public function getChannelDescription()
+    {
+        return $this->channelDescription;
+    }
+
+    /**
+     * @param null $channelDescription
+     */
+    public function setChannelDescription($channelDescription): void
+    {
+        $this->channelDescription = $channelDescription;
+    }
+
+    /**
+     * @return null
+     */
+    public function getChannelImageUrl()
+    {
+        return $this->channelImageUrl;
+    }
+
+    /**
+     * @param null $channelImageUrl
+     */
+    public function setChannelImageUrl($channelImageUrl): void
+    {
+        $this->channelImageUrl = $channelImageUrl;
+    }
+
+    /**
+     * @return null
+     */
+    public function getChannelMemberCount()
+    {
+        return $this->channelMemberCount;
+    }
+
+    /**
+     * @param null $channelMemberCount
+     */
+    public function setChannelMemberCount($channelMemberCount): void
+    {
+        $this->channelMemberCount = $channelMemberCount;
+    }
+
+    /**
+     * @return null
+     */
+    public function getChannelPhotoCount()
+    {
+        return $this->channelPhotoCount;
+    }
+
+    /**
+     * @param null $channelPhotoCount
+     */
+    public function setChannelPhotoCount($channelPhotoCount): void
+    {
+        $this->channelPhotoCount = $channelPhotoCount;
+    }
+
+    /**
+     * @return null
+     */
+    public function getChannelLinkCount()
+    {
+        return $this->channelLinkCount;
+    }
+
+    /**
+     * @param null $channelLinkCount
+     */
+    public function setChannelLinkCount($channelLinkCount): void
+    {
+        $this->channelLinkCount = $channelLinkCount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getChannelCountData(): int
+    {
+        return $this->channelCountData;
+    }
+
+    /**
+     * @param int $channelCountData
+     */
+    public function setChannelCountData(int $channelCountData): void
+    {
+        $this->channelCountData = $channelCountData;
+    }
+
+    /**
+     * @return DataChannelMessage[]
+     */
+    public function getMessages(): array
+    {
+        return $this->messages;
+    }
+
+    /**
+     * @param DataChannelMessage $message
+     */
+    public function addMessage(DataChannelMessage $message): void
+    {
+        $this->messages[] = $message;
+    }
 
 
 }
