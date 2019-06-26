@@ -40,6 +40,7 @@ class Data
     protected $channelMemberCount = null;
     protected $channelPhotoCount = null;
     protected $channelLinkCount = null;
+    protected $channelFileCount = null;
 
     protected $channelCountData = 0;
 
@@ -272,6 +273,23 @@ class Data
     {
         $this->channelLinkCount = $channelLinkCount;
     }
+
+    /**
+     * @return null
+     */
+    public function getChannelFileCount()
+    {
+        return $this->channelFileCount;
+    }
+
+    /**
+     * @param null $channelFileCount
+     */
+    public function setChannelFileCount($channelFileCount): void
+    {
+        $this->channelFileCount = $channelFileCount;
+    }
+
 
     /**
      * @return int

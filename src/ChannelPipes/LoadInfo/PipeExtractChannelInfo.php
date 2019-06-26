@@ -111,6 +111,9 @@ class PipeExtractChannelInfo
                 case 'links':
                     $data->setChannelLinkCount($value);
                     break;
+                case 'file':
+                    $data->setChannelFileCount($value);
+                    break;
             }
         }
     }

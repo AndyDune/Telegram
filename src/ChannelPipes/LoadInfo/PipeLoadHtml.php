@@ -16,13 +16,25 @@ use GuzzleHttp\Client;
 
 class PipeLoadHtml
 {
+    /**
+     *
+     * https://t.me/s/dune_english?before=34
+     *
+     * @var null|int
+     */
+    protected $before = null;
 
-    public function __invoke(Data $data, callable $next)
+
+    public function __invoke(Data $data, callable $next, $before = null)
     {
         if (!$data->getChannelName()) {
             $data->setErrorMessage('No channel name was set.');
             $data->setErrorPlace(PipeLoadHtml::class);
             return $data;
+        }
+
+        if ($before) {
+            $this->before = $before;
         }
 
         try {
@@ -52,8 +64,29 @@ class PipeLoadHtml
         return $next($data);
     }
 
+    /**
+     * @return int|null
+     */
+    public function getBefore(): ?int
+    {
+        return $this->before;
+    }
+
+    /**
+     * @param int|null $before
+     */
+    public function setBefore(?int $before): void
+    {
+        $this->before = $before;
+    }
+
+
     protected function getUrl($channelName)
     {
-        return 'https://t.me/s/' . $channelName;
+        $path = 'https://t.me/s/' . $channelName;
+        if ($this->before) {
+            $path .= "?before=" . $this->before;
+        }
+        return $path;
     }
 }

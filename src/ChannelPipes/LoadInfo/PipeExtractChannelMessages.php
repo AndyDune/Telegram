@@ -63,29 +63,74 @@ class PipeExtractChannelMessages
         $text = $this->extractMessageText();
         $message->setText($text);
 
+        $date = $this->extractDate();
+        if ($date) {
+            $message->setDateTime($date);
+        }
+
+        $value = $this->extractDocumentTitle();
+        if ($value) {
+            $message->setDocumentTitle($value);
+        }
+
+        $value = $this->extractDocumentExtra();
+        if ($value) {
+            $message->setDocumentExtra($value);
+        }
+
+        $value = $this->extractDocumentViewsCount();
+        if ($value) {
+            $message->setViewsCount((int)$value);
+        }
+
+        $value = $this->extractStickerImagePath();
+        if ($value) {
+            $message->setStickerImage($value);
+        }
+
+        $value = $this->extractMessageVoice();
+        if ($value) {
+            $message->setMessageVoice($value);
+        }
+
 
         return $message;
+    }
 
-        foreach ($row->childNodes as $child) {
-            if (!($child instanceof \DOMElement)) {
-                continue;
-            }
-            $class = $child->attributes->getNamedItem('class');
-            if (!$class) {
-                continue;
-            }
-            $class = $class->nodeValue;
-            if (strpos($class, 'tgme_widget_message_text') !== false) {
-                // extract message
-            }
 
-            if (strpos($class, 'tgme_widget_message_footer') !== false) {
-                $this->doc = $this->domElementToDocument($child);
-                $id = $this->extractId();
+    protected function extractDocumentViewsCount()
+    {
+        return $this->extractContentAsString('.tgme_widget_message_info .tgme_widget_message_views');
+    }
 
-            }
+    protected function extractStickerImagePath()
+    {
+        $style = $this->extractAttribute('.tgme_widget_message_sticker_wrap .tgme_widget_message_sticker', 'style');
+        if (!$style) {
+            return null;
         }
-        return null;
+
+        $matches = [];
+        if (!preg_match("|url\('([^']{5,})'\)|ui", $style, $matches)) {
+            return null;
+        }
+        return $matches[1];
+    }
+
+    protected function extractMessageVoice()
+    {
+        return $this->extractAttribute('.tgme_widget_message_voice', 'src');
+    }
+
+
+    protected function extractDocumentTitle()
+    {
+        return $this->extractContentAsString('.tgme_widget_message_document_title');
+    }
+
+    protected function extractDocumentExtra()
+    {
+        return $this->extractContentAsString('.tgme_widget_message_document_extra');
     }
 
 
@@ -93,6 +138,23 @@ class PipeExtractChannelMessages
     {
         return $this->extractContentAsHtml('.tgme_widget_message_text');
     }
+
+
+    /**
+     * Пример:
+     * 2019-01-22T12:10:23+00:00
+     *
+     * @return bool|\DateTime|string
+     */
+    protected function extractDate()
+    {
+        $date = $this->extractAttribute('.tgme_widget_message_info time', 'datetime');
+        if ($date) {
+            $date = \DateTime::createFromFormat('Y-m-d\TH:i:sP', $date);
+        }
+        return $date;
+    }
+
 
     protected function extractId()
     {
