@@ -38,6 +38,9 @@ class ChannelsInfoForMessages
     private $status;
 
     /** @ODM\Field(type="int") */
+    private $lastPostId;
+
+    /** @ODM\Field(type="int") */
     private $maxKnownPostId;
 
     /** @ODM\Field(type="int") */
@@ -126,6 +129,25 @@ class ChannelsInfoForMessages
     /**
      * @return mixed
      */
+    public function getLastPostId()
+    {
+        return $this->lastPostId;
+    }
+
+    /**
+     * @param mixed $lastPostId
+     * @return $this
+     */
+    public function setLastPostId($lastPostId): self
+    {
+        $this->lastPostId = $lastPostId;
+        return $this;
+    }
+
+
+    /**
+     * @return mixed
+     */
     public function getMaxKnownPostId()
     {
         return $this->maxKnownPostId;
@@ -135,7 +157,7 @@ class ChannelsInfoForMessages
      * @param mixed $maxKnownPostId
      * @return $this
      */
-    public function setMaxKnownPostId($maxKnownPostId): ChannelsInfoForMessages
+    public function setMaxKnownPostId($maxKnownPostId): self
     {
         if (!$this->maxKnownPostId or $this->maxKnownPostId < $maxKnownPostId) {
             $this->maxKnownPostId = $maxKnownPostId;

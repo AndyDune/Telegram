@@ -82,6 +82,16 @@ class ChannelMessages extends DocumentRepository
     }
 
 
+    public function deleteChannelMessageWithId(ChannelsInfoForMessages $channel, $id)
+    {
+        $queryBuilder =  $this->createQueryBuilder()->remove();
+        return $queryBuilder->field('channel')->equals($channel)
+            ->field('idWithinChannel')->equals($id)
+            ->getQuery()
+            ->execute();
+    }
+
+
     /**
      * @param int $version
      * @param int $limit

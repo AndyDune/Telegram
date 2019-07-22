@@ -20,6 +20,10 @@ use AndyDune\WebTelegram\ChannelPipes\LoadInfo\PipeCheckDataBeforeParse;
 use AndyDune\WebTelegram\ChannelPipes\LoadInfo\PipeExtractChannelInfo;
 use AndyDune\WebTelegram\ChannelPipes\LoadInfo\PipeExtractChannelMessages;
 use AndyDune\WebTelegram\ChannelPipes\LoadInfo\PipeLoadHtml;
+use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessages;
+use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelsInfoForMessages;
+use AndyDune\WebTelegram\Registry;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPUnit\Framework\TestCase;
 
 class ChannelPipesLoadInfoTest extends TestCase
@@ -148,8 +152,31 @@ class ChannelPipesLoadInfoTest extends TestCase
         //file_put_contents(__DIR__ . '/data/channel_info_s/rzn1rzn_before_46.html', $string);
     }
 
+    /**
+     * @covers \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages::updateMessageInstance
+     * @covers \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages::deleteMessagesBetweenIds
+     */
     public function testExtractFullFromFile()
     {
+
+        $registry = Registry::getInstance();
+        /** @var DocumentManager $dm */
+        $dm = $registry->getServiceManager()->get('document_manager');
+        $dm->clear();
+        $dm->getSchemaManager()->ensureIndexes();
+
+        $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
+        $base->remove([]);
+
+        $baseMessages = $dm->getDocumentDatabase(ChannelMessages::class)->selectCollection('channel_messages');
+        $baseMessages->remove([]);
+
+
+        $channelName = 'rzn1rzn';
+        $facade = new \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages($dm);
+        $facade->retrieveWithName($channelName);
+
+
         $data = new Data();
         $data->setHtmlBody(file_get_contents(__DIR__ . '/data/channel_info_s/rzn1rzn_before_46.html'));
         $data->setStatusCode(200);
@@ -175,6 +202,9 @@ class ChannelPipesLoadInfoTest extends TestCase
         $this->assertEquals('2019-06-26 10:36:46', $message->getDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals(2, $message->getViewsCount());
 
+
+        $facade->updateMessageInstance($message);
+
         // Message with text
         /** @var DataChannelMessage $message */
         $message = array_pop($messages);
@@ -185,6 +215,9 @@ class ChannelPipesLoadInfoTest extends TestCase
         $this->assertEquals('2019-06-26 10:35:42', $message->getDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals(2, $message->getViewsCount());
 
+        $facade->updateMessageInstance($message);
+        $facade->updateMessageInstance($message);
+
         // Message with emoji
         /** @var DataChannelMessage $message */
         $message = array_pop($messages);
@@ -194,6 +227,8 @@ class ChannelPipesLoadInfoTest extends TestCase
         $this->assertEquals('<i class="emoji" style="background-image:url(\'//telegram.org/img/emoji/40/F09F9880.png\')"><b>😀</b></i>', $message->getText());
         $this->assertEquals('2019-06-26 10:35:27', $message->getDateTime()->format('Y-m-d H:i:s'));
         $this->assertEquals(2, $message->getViewsCount());
+
+        $facade->updateMessageInstance($message);
 
         // Message with sticker
         /** @var DataChannelMessage $message */
@@ -206,6 +241,8 @@ class ChannelPipesLoadInfoTest extends TestCase
         $this->assertEquals(2, $message->getViewsCount());
         $this->assertEquals('https://cdn4.telesco.pe/file/6158981d74.webp?token=XB2-RI9mlEDQLIk1fyn0VCJxb6N1uanlJPTAw5Oc1zOb9IkVb-gdFaClEc3UsFnLySwtIx0HUuPrWNuXV1RvClW7i9ZZry9nKaiUr9jRQem4HxWJAlXeYC12mW9GB5z-FfBUkLc0xV8dmLgpB96yHwens_qjHCuKK7K926N73Va8IavSeVVwf_DSdFe-z-miCugIDHXwRcxpRSZKzjbJ1v1exVbj8m5_E5VsLFHms6_3ZE4PsIR2c_DLgnHK8qIIjpAvDurAuCshe6cq9LjzbJotroQWInvuS0iXPQYR94OpIReLUQLevi1W_zWugNk6tQDhMACUcOmyD4_5yrkWwQ',
             $message->getStickerImage());
+
+        $facade->updateMessageInstance($message);
 
         array_pop($messages);
 
@@ -220,6 +257,64 @@ class ChannelPipesLoadInfoTest extends TestCase
         $this->assertEquals(2, $message->getViewsCount());
         $this->assertEquals('https://cdn4.telesco.pe/file/52e90a376d.ogg?token=j4bSVp8U2oS5KBmD_J2mxWFwOkmFVQpD-uucWes-EHEq63HjAJW0KrNVBFlh8z5R_hVzn9ab26AWa0lSVL6P9HuK67IjoIaSoQVX_aW5r7jgde66pAAHR7yD7T9RbVtAfCIxOrERgMD5lbIBNMGDNAall2gMlJFVY2NdwVqFvQyJ_66KGMPCSf6QobZP6kk9uUxtwIVEKOBVMN5TpTQu6rdSLBEfAJar3QD-imQv0eT55FOF8gPJcOroHQE0mSrTgtmkKOBqlCtSafswp3oizIG5rRYp9vCYq5lQgKtLTIB7B21WLu3K3gB-5dU6EGlrGixmSzc3YMJTUW1i2WE58Q',
             $message->getMessageVoice());
+
+        $facade->updateMessageInstance($message);
+
+        $info = $facade->retrieveWithName($channelName, false)->getChannelInfoDocument();
+        $list = $facade->getChannelMessagesRepository()->findBy(['channel' => $info]);
+        /** @var ChannelMessages[] $listIdKey */
+        $listIdKey = [];
+        /** @var ChannelMessages $row */
+        foreach ($list as $row) {
+            $listIdKey[$row->getIdWithinChannel()] = $row;
+        }
+
+        $this->assertCount(5, $listIdKey);
+
+        $this->assertTrue($listIdKey[45]->isContentTypeText());
+        $this->assertTrue($listIdKey[45]->isContentTypeDocument());
+
+        $this->assertTrue($listIdKey[44]->isContentTypeText());
+        $this->assertFalse($listIdKey[44]->isContentTypeDocument());
+
+        $this->assertFalse($listIdKey[42]->isContentTypeText());
+        $this->assertTrue($listIdKey[42]->isContentTypeSticker());
+        $this->assertFalse($listIdKey[42]->isContentTypeDocument());
+
+        $this->assertFalse($listIdKey[40]->isContentTypeText());
+        $this->assertFalse($listIdKey[40]->isContentTypeSticker());
+        $this->assertFalse($listIdKey[40]->isContentTypeDocument());
+        $this->assertTrue($listIdKey[40]->isContentTypeVoice());
+
+        $facade->deleteMessagesBetweenIds(45, 43);
+
+        $list = $facade->getChannelMessagesRepository()->findBy(['channel' => $info]);
+        /** @var ChannelMessages[] $listIdKey */
+        $listIdKey = [];
+        /** @var ChannelMessages $row */
+        foreach ($list as $row) {
+            $listIdKey[$row->getIdWithinChannel()] = $row;
+        }
+
+        $this->assertCount(4, $listIdKey);
+        $this->assertArrayNotHasKey(44, $listIdKey);
+
+
+        $facade->deleteMessagesBetweenIds(40, 45);
+
+
+        $list = $facade->getChannelMessagesRepository()->findBy(['channel' => $info]);
+        /** @var ChannelMessages[] $listIdKey */
+        $listIdKey = [];
+        /** @var ChannelMessages $row */
+        foreach ($list as $row) {
+            $listIdKey[$row->getIdWithinChannel()] = $row;
+        }
+
+        $this->assertCount(2, $listIdKey);
+        $this->assertArrayNotHasKey(42, $listIdKey);
+        $this->assertArrayHasKey(45, $listIdKey);
+        $this->assertArrayHasKey(40, $listIdKey);
 
     }
 

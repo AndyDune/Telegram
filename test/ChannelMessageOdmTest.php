@@ -417,10 +417,10 @@ class ChannelMessageOdmTest extends TestCase
         $dm->getSchemaManager()->ensureIndexes();
 
         $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
-        $base->remove(['name' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
+        $base->remove([]);
 
         $baseMessages = $dm->getDocumentDatabase(ChannelMessages::class)->selectCollection('channel_messages');
-        $baseMessages->remove(['channelName' => ['$in' => ['test_dune_english', 'test_rzn1rzn', 'test_test']]]);
+        $baseMessages->remove([]);
 
 
         $facade = new \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages($dm);

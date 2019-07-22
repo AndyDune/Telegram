@@ -95,6 +95,11 @@ class ChannelMessages
      */
     private $contentTypeSticker = false;
 
+    /**
+     * @ODM\Field(type="boolean")
+     */
+    private $contentTypeDocument = false;
+
 
     /**
      * @return mixed
@@ -111,6 +116,26 @@ class ChannelMessages
     {
         return $this->contentTypeText;
     }
+
+    /**
+     * @return bool
+     */
+    public function isContentTypeDocument()
+    {
+        return $this->contentTypeDocument;
+    }
+
+    /**
+     * @param mixed $contentTypeDocument
+     * @return $this
+     */
+    public function setContentTypeDocument($contentTypeDocument): self
+    {
+        $this->contentTypeDocument = $contentTypeDocument;
+        return $this;
+    }
+
+
 
     /**
      * @param mixed $contentTypeText

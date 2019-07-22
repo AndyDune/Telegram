@@ -13,6 +13,7 @@
 namespace AndyDune\WebTelegram\DoctrineOdm\Facade;
 
 
+use AndyDune\WebTelegram\ChannelPipes\LoadInfo\DataChannelMessage;
 use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelMessagesVersions;
 use AndyDune\WebTelegram\DoctrineOdm\Documents\ChannelsInfoForMessages;
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelMessage;
@@ -123,6 +124,80 @@ class ChannelMessages
         return $this->channelInfoDocument;
     }
 
+    public function deleteMessagesBetweenIds($idFrom, $idTo)
+    {
+        $repo = $this->getChannelMessagesRepository();
+
+        if ($idTo < $idFrom) {
+            $temp = $idTo;
+            $idTo = $idFrom;
+            $idFrom = $temp;
+        }
+
+        $idFrom++;
+        $idTo--;
+
+        $deleted = 0;
+        for ($id = $idFrom; $id <= $idTo; $id++) {
+            $message = $this->getMessageWithId($id, false);
+            if ($message) {
+                $deleted++;
+                $repo->deleteChannelMessageWithId($this->channelInfoDocument, $id);
+            }
+        }
+
+        $repo->getDocumentManager()->flush();
+        return $deleted;
+    }
+
+
+    public function updateMessageInstance(DataChannelMessage $message)
+    {
+        if (!$message->getId()) {
+            return false;
+        }
+
+        $channelMessage = $this->getMessageWithId($message->getId());
+
+        $channelMessage->setViews($message->getViewsCount());
+        $channelMessage->setDate($message->getDateTime());
+
+        if ($content = $message->getText()) {
+            $channelMessage->setText($content);
+        }
+
+        $value = $message->getMessageVoice();
+        if ($value) {
+            $channelMessage->setContentTypeVoice(true);
+        } else {
+            $channelMessage->setContentTypeVoice(false);
+        }
+
+        $value = $message->getStickerImage();
+        if ($value) {
+            $channelMessage->setContentTypeSticker(true);
+        } else {
+            $channelMessage->setContentTypeSticker(false);
+        }
+
+        $value = $message->getDocumentExtra();
+        if ($value) {
+            $channelMessage->setContentTypeDocument(true);
+        } else {
+            $channelMessage->setContentTypeDocument(false);
+        }
+
+        $this->getChannelMessagesRepository()->getDocumentManager()->flush();
+
+    }
+
+        /**
+     *
+     * @deprecated
+     * @param ChannelMessage $extractor
+     * @return bool
+     * @throws \Exception
+     */
     public function fillMessageInstanceWithExtractedData(ChannelMessage $extractor)
     {
         if (!$extractor->isSuccess()) {

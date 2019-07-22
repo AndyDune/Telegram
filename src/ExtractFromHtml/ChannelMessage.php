@@ -13,6 +13,16 @@
 namespace AndyDune\WebTelegram\ExtractFromHtml;
 use Zend\Dom\Document;
 
+/**
+ * @deprecated use pipeline as in test
+ *
+ * @see \AndyDuneTest\WebTelegram\ChannelPipesLoadInfoTest
+ *
+ * @see PipeExtractChannelMessages
+ *
+ * Class ChannelMessage
+ * @package AndyDune\WebTelegram\ExtractFromHtml
+ */
 class ChannelMessage
 {
 
