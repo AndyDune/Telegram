@@ -44,6 +44,8 @@ class Data
 
     protected $channelCountData = 0;
 
+    protected $beforeId = null;
+
     /**
      * @var DataChannelMessage[]
      */
@@ -323,5 +325,20 @@ class Data
         $this->messages[] = $message;
     }
 
+    /**
+     * @return null
+     */
+    public function getBeforeId()
+    {
+        return $this->beforeId;
+    }
+
+    /**
+     * @param null $beforeId
+     */
+    public function setBeforeId($beforeId): void
+    {
+        $this->beforeId = $beforeId;
+    }
 
 }

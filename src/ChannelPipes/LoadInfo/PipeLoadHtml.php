@@ -51,6 +51,8 @@ class PipeLoadHtml
             return $data;
         }
 
+        $data->setBeforeId($this->before);
+
         $code = $res->getStatusCode();
         $data->setStatusCode($code);
 
