@@ -398,4 +398,44 @@ class ChannelPipesLoadInfoTest extends TestCase
 
     }
 
-}
+    public function testExtractFullFromFileBigNumbers()
+    {
+
+        $registry = Registry::getInstance();
+        /** @var DocumentManager $dm */
+        $dm = $registry->getServiceManager()->get('document_manager');
+        $dm->clear();
+        $dm->getSchemaManager()->ensureIndexes();
+
+        $base = $dm->getDocumentDatabase(ChannelsInfoForMessages::class)->selectCollection('channel_info_for_messages');
+        $base->remove([]);
+
+        $baseMessages = $dm->getDocumentDatabase(ChannelMessages::class)->selectCollection('channel_messages');
+        $baseMessages->remove([]);
+
+
+        $channelName = 'updateee';
+        $facade = new \AndyDune\WebTelegram\DoctrineOdm\Facade\ChannelMessages($dm);
+        $facade->retrieveWithName($channelName);
+
+        $data = new Data();
+        $data->setChannelName($channelName);
+        $pipeLine = new Pipeline();
+        $pipeLine->pipe(PipeLoadHtml::class, null);
+        $pipeLine->pipe(PipeCheckDataBeforeParse::class);
+        $pipeLine->pipe(PipeExtractChannelInfo::class);
+        $pipeLine->pipe(PipeExtractChannelMessages::class);
+        $pipeLine->send($data);
+
+        $pipeLine->execute();
+
+        $this->assertEquals('', $data->getErrorMessage());
+        $this->assertEquals(200, $data->getStatusCode());
+
+        $this->assertGreaterThan(49000, $data->getChannelMemberCount());
+        $this->assertGreaterThan(1, $data->getChannelLinkCount());
+        $this->assertGreaterThan(3000, $data->getChannelPhotoCount());
+
+    }
+
+    }

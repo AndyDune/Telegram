@@ -12,6 +12,7 @@
 
 namespace AndyDune\WebTelegram\ChannelPipes\LoadInfo;
 
+use AndyDune\WebTelegram\ExtractFromHtml\Part\ExtractIntegerFromString;
 use AndyDune\WebTelegram\ExtractFromHtml\Part\ExtractWithDomTrait;
 use Zend\Dom\Document\Query;
 use Zend\Dom\Document;
@@ -19,6 +20,7 @@ use Zend\Dom\Document;
 class PipeExtractChannelInfo
 {
     use ExtractWithDomTrait;
+    use ExtractIntegerFromString;
 
 
     protected $channelInfoTitle = [
@@ -87,7 +89,7 @@ class PipeExtractChannelInfo
                 }
                 $class = $class->nodeValue;
                 if (strpos('counter_value', $class) !== false) {
-                    $value = (int)$part->nodeValue;
+                    $value = $this->extractIntegerFromString($part->nodeValue);
                     continue;
                 }
 

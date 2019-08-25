@@ -13,6 +13,7 @@
 namespace AndyDuneTest\WebTelegram;
 
 use AndyDune\WebTelegram\ExtractFromHtml\ChannelInfo;
+use AndyDune\WebTelegram\ExtractFromHtml\Part\ExtractIntegerFromString;
 use PHPUnit\Framework\TestCase;
 
 
@@ -42,6 +43,32 @@ use PHPUnit\Framework\TestCase;
  */
 class ChannelInfoExtractFromHtmlTest extends TestCase
 {
+    /**
+     * @covers ExtractIntegerFromString::extractIntegerFromString()
+     */
+    public function testExtractIntegerFromString()
+    {
+        $instance = new class() {
+            use ExtractIntegerFromString { extractIntegerFromString as public;}
+        };
+
+        $value = '50.2K';
+        $this->assertEquals(50200, $instance->extractIntegerFromString($value));
+
+        $value = '40k';
+        $this->assertEquals(40000, $instance->extractIntegerFromString($value));
+
+        $value = '10 010';
+        $this->assertEquals(10010, $instance->extractIntegerFromString($value));
+
+        $value = '23';
+        $this->assertEquals(23, $instance->extractIntegerFromString($value));
+
+        $value = '4.7M';
+        $this->assertEquals(4700000, $instance->extractIntegerFromString($value));
+
+    }
+
     public function testSuccessExtract()
     {
         $info = new ChannelInfo(file_get_contents(__DIR__ . '/data/channel_info/normal.html'));
