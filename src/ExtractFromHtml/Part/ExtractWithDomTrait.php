@@ -39,7 +39,7 @@ trait ExtractWithDomTrait
                 if ($noHtml) {
                     $string = strip_tags($string);
                 }
-                return $string;
+                return trim($string);
             }
         }
         return false;

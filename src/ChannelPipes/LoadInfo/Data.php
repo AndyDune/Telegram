@@ -21,7 +21,8 @@ class Data
     const ERROR_CODE_302 = '302';
     const ERROR_NO_200 = 'no_200';
     const ERROR_NO_DOCTYPE = 'no_doctype';
-    const ERROR_NO_CHANNEL_TITLE = 'no_channel_title';
+    const ERROR_CONTENT_NO_CHANNEL_TITLE = 'content_no_channel_title';
+    const ERROR_CONTENT_PROBABLY_PERSON = 'content_probably_person';
 
     protected $channelName = null;
     protected $channelNormalName = null;
@@ -38,9 +39,13 @@ class Data
     protected $channelDescription = null;
     protected $channelImageUrl = null;
     protected $channelMemberCount = null;
+    protected $channelMemberOnlineCount = null;
     protected $channelPhotoCount = null;
     protected $channelLinkCount = null;
     protected $channelFileCount = null;
+
+    protected $personTitle = null;
+    protected $personExtra = null;
 
     protected $channelCountData = 0;
 
@@ -247,6 +252,22 @@ class Data
     /**
      * @return null
      */
+    public function getChannelMemberOnlineCount()
+    {
+        return $this->channelMemberOnlineCount;
+    }
+
+    /**
+     * @param null $channelMemberOnlineCount
+     */
+    public function setChannelMemberOnlineCount($channelMemberOnlineCount): void
+    {
+        $this->channelMemberOnlineCount = $channelMemberOnlineCount;
+    }
+
+    /**
+     * @return null
+     */
     public function getChannelPhotoCount()
     {
         return $this->channelPhotoCount;
@@ -339,6 +360,38 @@ class Data
     public function setBeforeId($beforeId): void
     {
         $this->beforeId = $beforeId;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPersonTitle()
+    {
+        return $this->personTitle;
+    }
+
+    /**
+     * @param null $personTitle
+     */
+    public function setPersonTitle($personTitle): void
+    {
+        $this->personTitle = $personTitle;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPersonExtra()
+    {
+        return $this->personExtra;
+    }
+
+    /**
+     * @param null $personExtra
+     */
+    public function setPersonExtra($personExtra): void
+    {
+        $this->personExtra = $personExtra;
     }
 
 }

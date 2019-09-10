@@ -7,6 +7,8 @@
  * | Date: 25.06.2019                            |
  * -----------------------------------------------
  *
+ * test:
+ * @see \AndyDuneTest\WebTelegram\ChannelPipesLoadInfoTest
  */
 
 
@@ -42,9 +44,9 @@ class PipeExtractChannelInfo
         // заголовок есть всегда
         $title = $this->extractContentAsString($this->channelInfoTitle);
         if ($title === false) {
-            $data->getErrorMessage('No channel title was found.');
-            $data->getErrorCode(11);
-            $data->getErrorMessage(PipeExtractChannelInfo::class);
+            $data->setErrorMessage('No channel title was found.');
+            $data->setErrorCode(Data::ERROR_CONTENT_NO_CHANNEL_TITLE);
+            $data->setErrorPlace(PipeExtractChannelInfo::class);
             return $data;
         }
         $data->setChannelTitle($title);

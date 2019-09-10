@@ -24,21 +24,21 @@ class PipeCheckDataBeforeParse
     {
         if ($data->getStatusCode() == 302) {
             $data->setErrorMessage('Was redirect 302.');
-            $data->setErrorCode(0);
+            $data->setErrorCode(Data::ERROR_CODE_302);
             $data->setErrorPlace(PipeCheckDataBeforeParse::class);
             return $this->executeCallBack($data);
         }
 
         if ($data->getStatusCode() != 200) {
             $data->setErrorMessage('Status is not 200.');
-            $data->setErrorCode(1);
+            $data->setErrorCode(Data::ERROR_NO_200);
             $data->setErrorPlace(PipeCheckDataBeforeParse::class);
             return $this->executeCallBack($data);
         }
 
         if (!preg_match('|<!DOCTYPE html>|ui', $data->getHtmlBody())) {
             $data->setErrorMessage('No html doctype.');
-            $data->setErrorCode(2);
+            $data->setErrorCode(Data::ERROR_NO_DOCTYPE);
             $data->setErrorPlace(PipeCheckDataBeforeParse::class);
             return $this->executeCallBack($data);
         }
